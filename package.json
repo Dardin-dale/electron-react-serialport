@@ -13,13 +13,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^2.0.18"
+    "electron": "^2.0.18",
+    "electron-rebuild": "^1.8.6"
   },
   "dependencies": {
     "concurrently": "^5.0.0",
     "cross-env": "^6.0.3",
     "electron-builder": "^21.2.0",
-    "electron-rebuild": "^1.8.6",
     "serialport": "^7.1.5",
     "wait-on": "^3.3.0"
   },
