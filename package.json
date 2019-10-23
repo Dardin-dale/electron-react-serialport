@@ -1,0 +1,38 @@
+{
+  "name": "electdemo",
+  "version": "0.0.0",
+  "description": "",
+  "main": "main/main.js",
+  "scripts": {
+    "electron-build": "electron-builder",
+    "build": "electron-build $$ cd renderer && yarn react-scripts build",
+    "start": "concurrently \"wait-on http://localhost:3000 && electron .\" \"cd renderer && cross-env BROWSER=none yarn react-scripts start\"",
+    "install": "electron-rebuild -f -w serialport"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^2.0.18"
+  },
+  "dependencies": {
+    "concurrently": "^5.0.0",
+    "cross-env": "^6.0.3",
+    "electron-builder": "^21.2.0",
+    "electron-rebuild": "^1.8.6",
+    "serialport": "^7.1.5",
+    "wait-on": "^3.3.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
