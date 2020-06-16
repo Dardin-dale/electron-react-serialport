@@ -1,38 +1,46 @@
 {
-  "name": "electdemo",
-  "version": "0.0.0",
-  "description": "",
-  "main": "main/main.js",
+  "name": "electron-serialport-react",
+  "version": "1.0.0",
+  "description": "A boilerplate for Electron for serialport use",
+  "private": true,
+  "main": "main.js",
   "scripts": {
-    "electron-build": "electron-builder",
-    "build": "electron-build $$ cd renderer && yarn react-scripts build",
-    "start": "concurrently \"wait-on http://localhost:3000 && electron .\" \"cd renderer && cross-env BROWSER=none yarn react-scripts start\"",
-    "install": "electron-rebuild -f -w serialport"
+    "start": "electron .",
+    "build": "webpack --config ./webpack.config.js",
+    "rebuild": "./node_modules/.bin/electron-rebuild",
+    "pack": "npm run-script build && electron-builder --dir",
+    "dist": "npm run-script build && electron-builder"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": "https://github.com/electron/electron-quick-start",
+  "build": {
+    "appId": "serialplate"
+  },
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo",
+    "serial",
+    "serialport"
+  ],
+  "author": "Logan Crecraft",
+  "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^2.0.18",
-    "electron-rebuild": "^1.8.6"
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/preset-react": "^7.7.4",
+    "electron": "^7.1.2",
+    "electron-builder": "^22.7.0",
+    "electron-rebuild": "^1.11.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "concurrently": "^5.0.0",
-    "cross-env": "^6.0.3",
-    "electron-builder": "^21.2.0",
-    "serialport": "^7.1.5",
-    "wait-on": "^3.3.0"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "@babel/polyfill": "^7.10.1",
+    "npm": "^6.14.5",
+    "serialport": "^9.0.0"
   }
 }
