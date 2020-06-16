@@ -32,7 +32,8 @@ npm install
 npm rebuild
 # Run the app
 npm start
-# 
+# Build the distributable
+npm run-script dist
 
 ```
 

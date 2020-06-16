@@ -8,8 +8,8 @@
     "start": "electron .",
     "build": "webpack --config ./webpack.config.js",
     "rebuild": "./node_modules/.bin/electron-rebuild",
-    "pack": "npm build && electron-builder --dir",
-    "dist": "npm build && electron-builder"
+    "pack": "npm run-script build && electron-builder --dir",
+    "dist": "npm run-script build && electron-builder"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "build": {

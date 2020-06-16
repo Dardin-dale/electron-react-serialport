@@ -1,7 +1,8 @@
 const path = require('path');
 
 module.exports = {
-  entry: './main.js',
+  mode: 'development',
+  entry: './main',
   module: {
     rules: [{
       include: /src/
@@ -11,4 +12,11 @@ module.exports = {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  externals: {
+    serialport: 'serialport',
+  },
+  //this is from a webpack bug
+  node: {
+    fs: "empty"
+ }
 };
