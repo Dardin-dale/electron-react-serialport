@@ -1,6 +1,7 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
+const Serialport = require('serialport');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -51,3 +52,16 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+
+// Use this code to test if you can get ES6 features to work
+// async function asyncTest () {
+//   let test = await myAsyncfunc();
+//   console.log(test);
+// }
+
+// async function myAsyncfunc () {
+//   return new Promise(resolve => {
+//       setTimeout(resolve("async/await now runs"), 1000);
+//   })
+// }
