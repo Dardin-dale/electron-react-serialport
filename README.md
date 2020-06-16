@@ -1,9 +1,15 @@
-# electron-React-Serialport
+# Electron-React-Serialport
 
 **Clone and run for a quick way to see Electron in action.**
 
 This is a minimal Electron application based on the [Quick Start Guide](https://electronjs.org/docs/tutorial/quick-start) within the Electron documentation. 
-This application uses React in combination with 
+This application uses React in combination with Electron for the serialport use case. I personally have had a lot of trial and error getting the npm serialport module to bundle nicely with Electron and React so I hope this helps. Making sure that the version of Node.js and Electron.js matches the version that serialport is compiled with is key. After importing the serialport I use electron-rebuild to ensure that the library is re-compiled to the correct Node.js version. I manually imported React and took the examples from the Electrate project. I found that create-react-app and yarn gave me additional trouble trying to get the serialport library to integrate. I've added webpack and babel to allow for most React/JSX compatibility and polyfill for ES6 Promises that are extremely useful for communicating with the serial device.
+
+This is the bare version of the app that is mostly neutral on application development. For simpler application I prefer to directly use node integrations to talk to the serialport. For a more advanced application it is recommended to use ipc connections separating the main Electron Process from the renderer. The more advanced branch will use Redux to manage state in the renderer process and keep track of devices.
+
+See branches:
+`simple-app` - for a direct node integration example
+`full-app` - for an ipc/redux capable application
 
 **Use this app along with the [Electron API Demos](https://electronjs.org/#get-started) app for API code examples to help you get started.**
 
@@ -23,7 +29,7 @@ From your command line:
 
 ```bash
 # Clone this repository
-git clone https://github.com/electron/electron-quick-start
+git clone https://github.com/Dardin-dale/electron-react-serialport
 # Go into the repository
 cd electron-quick-start
 # Install dependencies
@@ -38,6 +44,10 @@ npm run-script dist
 ```
 
 Note: If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `node` from the command prompt.
+
+## Development
+
+Here are some structure notes
 
 ## Resources for Learning Electron
 
