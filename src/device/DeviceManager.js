@@ -54,7 +54,7 @@ function DeviceManager () {
     }
 
     //main runner for getting devices. gets device serial numbers and OEM information
-    this.getPods = async function () {
+    this.getdevices = async function () {
         try{
             let ports = await this.getPorts();
             let pods = await this.getPodInfo(ports);
@@ -83,6 +83,16 @@ function DeviceManager () {
             } else {
                 throw Error("No valid licenses.");
             }
+        } catch (err) {
+            throw Error(err);
+        }
+    }
+
+    this.ledOn = async function(my_device) {
+        try{
+            let device = new MyDevice(my_device.com);
+            device.ledOn();
+            my_device.port.close(); 
         } catch (err) {
             throw Error(err);
         }

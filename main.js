@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
-const Serialport = require('serialport');
+//assets get used from src which is included in webpack, build folder is for electron-builder's NSIS executable/installers
+const icon = path.join(__dirname,'src/assets/icon.png');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -10,12 +11,19 @@ let mainWindow
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 420,
+    height: 450,
+    center:true,
+    autoHideMenuBar: true,
     webPreferences: {
+      nodeIntegration: true,
+      //prevents users from looking with chrome dev tools.
+      devTools: false,
       preload: path.join(__dirname, 'preload.js')
     }
   })
+
+  mainWindow.setIcon(icon);
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'))
