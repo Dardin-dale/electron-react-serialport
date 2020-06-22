@@ -72,14 +72,14 @@ function DeviceManager () {
         }
     }
 
-    //checks foe a valid pod and then updates device
-    this.updateDevice = async function(web_device, oem) {
+    //checks foe a valid pod and then updates device's OEM
+    this.updateDevice = async function(my_device, oem) {
         try{
             let valid_info = true;
             if (valid_info) {
-                let device = new MyDevice(web_device.com);
+                let device = new MyDevice(my_device.com);
                 await device.setOEM(oem);
-                web_device.port.close();
+                my_device.port.close();
             } else {
                 throw Error("No valid licenses.");
             }
