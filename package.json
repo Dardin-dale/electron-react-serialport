@@ -3,15 +3,13 @@
   "version": "1.0.0",
   "description": "A boilerplate for Electron for serialport use",
   "private": true,
-  "main": "main.js",
+  "main": "app/main.js",
   "scripts": {
-    "start": "npm-run-all --parallel start:react start:electron",
-    "start:electron": "electron .",
-    "start:react": "webpack-dev-server --config ./webpack.config.js --mode development",
-    "compile": "webpack --config ./webpack.config.js --mode production",
+    "start": "gulp",
+    "compile": "gulp build",
     "rebuild": "./node_modules/.bin/electron-rebuild",
-    "pack": "npm run-script compile && electron-builder --dir",
-    "dist": "npm run-script compile && electron-builder"
+    "release": "gulp release",
+    "dist": "build"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "build": {
@@ -32,30 +30,25 @@
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.10.3",
     "@babel/preset-react": "^7.7.4",
-    "babel-loader": "^8.1.0",
-    "css-loader": "^3.6.0",
     "electron": "^7.1.2",
     "electron-builder": "^22.7.0",
-    "electron-native-loader": "^0.3.0",
-    "electron-native-plugin": "^0.3.0",
     "electron-rebuild": "^1.11.0",
-    "file-loader": "^6.0.0",
-    "html-webpack-plugin": "^4.3.0",
-    "node-loader": "^0.6.0",
-    "npm-run-all": "^4.1.5",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "style-loader": "^1.2.1",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10"
+    "react-dom": "^16.13.1"
   },
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@babel/polyfill": "^7.10.1",
     "electron-is-dev": "^1.2.0",
+    "electron-react-devtools": "^0.5.3",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-livereload": "^4.0.2",
     "npm": "^6.14.5",
     "react-hot-loader": "^4.12.21",
-    "serialport": "^9.0.0",
-    "webpack-dev-server": "^3.11.0"
+    "react-test-renderer": "^16.13.1",
+    "serialport": "^9.0.0"
   }
 }

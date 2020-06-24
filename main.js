@@ -5,7 +5,7 @@ const path = require('path')
 const icon = path.join(__dirname,'assets/icon.png');
 const isDev = require('electron-is-dev');
 
-//const url = require('url')
+const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -22,19 +22,23 @@ function createWindow () {
       nodeIntegration: true,
       //prevents users from looking with chrome dev tools.
       //devTools: false,
-      preload: path.join(__dirname, 'preload.js')
+      //preload: path.join(__dirname, 'preload.js')
     }
   })
 
   mainWindow.setIcon(icon);
 
   // and load the index.html of the app.
-  //mainWindow.loadFile(path.join(__dirname, '/index.html'))
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:8082/')
-  } else {
-    mainWindow.loadURL(`file://${__dirname}/index.html`)
-  }
+  mainWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'index.html'),
+    protocol: 'file:',
+    slashes: true
+  }));
+  // if (isDev) {
+  //   mainWindow.loadURL('http://localhost:8082/')
+  // } else {
+  //   mainWindow.loadURL(`file://${__dirname}/index.html`)
+  // }
 
 
   // Open the DevTools.
