@@ -2,6 +2,9 @@
 
 **Clone and run for a quick way to see Electron in action.**
 
+This version still has issues - try electron-native-plugin and configurations. will probably need electron-native-patch-loader custom definition to get working.
+
+
 [Quick Start Guide For Electron](https://electronjs.org/docs/tutorial/quick-start)
 
 This application uses React in combination with Electron for the serialport use case. I personally have had a lot of trial and error getting the npm serialport module to bundle nicely with Electron and React so, I hope this helps. After importing the serialport library I use electron-rebuild to ensure that the library is re-compiled to the correct Node.js version. I manually imported React and took the examples from the [Electrate project](). I found that create-react-app and yarn gave me issues trying to troubleshoot getting the serialport library to integrate.

@@ -37,6 +37,7 @@
     "electron": "^7.1.2",
     "electron-builder": "^22.7.0",
     "electron-native-loader": "^0.3.0",
+    "electron-native-patch-loader": "^0.3.0",
     "electron-native-plugin": "^0.3.0",
     "electron-rebuild": "^1.11.0",
     "file-loader": "^6.0.0",
