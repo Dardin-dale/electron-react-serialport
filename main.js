@@ -2,7 +2,10 @@
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 //assets get used from src which is included in webpack, build folder is for electron-builder's NSIS executable/installers
-const icon = path.join(__dirname,'src/assets/icon.png');
+const icon = path.join(__dirname,'assets/icon.png');
+const isDev = require('electron-is-dev');
+
+//const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -18,7 +21,7 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true,
       //prevents users from looking with chrome dev tools.
-      devTools: false,
+      //devTools: false,
       preload: path.join(__dirname, 'preload.js')
     }
   })
@@ -26,7 +29,13 @@ function createWindow () {
   mainWindow.setIcon(icon);
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, 'index.html'))
+  //mainWindow.loadFile(path.join(__dirname, '/index.html'))
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:8082/')
+  } else {
+    mainWindow.loadURL(`file://${__dirname}/index.html`)
+  }
+
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
