@@ -22,7 +22,6 @@ function createWindow () {
       nodeIntegration: true,
       //prevents users from looking with chrome dev tools.
       //devTools: false,
-      //preload: path.join(__dirname, 'preload.js')
     }
   })
 
@@ -34,11 +33,6 @@ function createWindow () {
     protocol: 'file:',
     slashes: true
   }));
-  // if (isDev) {
-  //   mainWindow.loadURL('http://localhost:8082/')
-  // } else {
-  //   mainWindow.loadURL(`file://${__dirname}/index.html`)
-  // }
 
 
   // Open the DevTools.
@@ -75,7 +69,7 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 
 
-// Use this code to test if you can get ES6 features to work
+// //Use this code to test if you can get ES6 features to work
 // async function asyncTest () {
 //   let test = await myAsyncfunc();
 //   console.log(test);
