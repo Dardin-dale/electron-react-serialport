@@ -13,7 +13,13 @@
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "build": {
-    "appId": "serialplate"
+    "appId": "electron-react-serialport",
+    "files": [
+      "app/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "publish": null
   },
   "keywords": [
     "Electron",
