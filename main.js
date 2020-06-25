@@ -4,7 +4,7 @@ const path = require('path')
 //assets get used from src which is included in webpack, build folder is for electron-builder's NSIS executable/installers
 const icon = path.join(__dirname,'assets/icon.png');
 const isDev = require('electron-is-dev');
-
+import "@babel/polyfill";
 const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will

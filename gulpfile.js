@@ -3,6 +3,7 @@ const gulp = require('gulp');
 const babel = require('gulp-babel');
 const css = require('gulp-clean-css');
 const livereload = require('gulp-livereload');
+var map = require('map-stream');
 
 gulp.task('copy', () => {
     return gulp.src('assets/**/*')
@@ -23,12 +24,19 @@ gulp.task('css', () => {
 });
 
 
-// gulp.task('json', () => {
-//     return gulp.src('src/**/*.json')
-//         .pipe(gulpJson())
-//         .pipe(gulp.dest('app/'))
-//         .pipe(livereload());
-// });
+gulp.task('json', () => {
+    return gulp.src('src/**/*.json')
+        .pipe(map(function(file, done) {
+            var json = JSON.parse(file.contents.toString());
+            var transformedJson = {
+            "newRootLevel": json
+            };
+            file.contents = new Buffer(JSON.stringify(transformedJson));
+            done(null, file);
+        }))
+        .pipe(gulp.dest('app/'))
+        .pipe(livereload());
+});
 
 
 gulp.task('js', () => {
@@ -43,9 +51,10 @@ gulp.task('watch', async function() {
   gulp.watch('src/**/*.html', gulp.series('html'));
   gulp.watch('src/**/*.css', gulp.series('css'));
   gulp.watch('src/**/*.js', gulp.series('js'));
+  gulp.watch('src/**/*.json', gulp.series('json'));
 });
 
-gulp.task('build', gulp.series('copy', 'html', 'css', 'js'));
+gulp.task('build', gulp.series('copy', 'html', 'css', 'js', 'json'));
 
 gulp.task('start', gulp.series('build', () => {
     return exec(

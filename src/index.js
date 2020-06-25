@@ -6,8 +6,8 @@
 // process.
 import * as React from 'react';
 import ReactDOM from 'react-dom';
+import "@babel/polyfill";
 import Home from './Home';
-import './index.css';
 
 window.onload = () => {
     ReactDOM.render(<Home/>, document.getElementById('app'));
