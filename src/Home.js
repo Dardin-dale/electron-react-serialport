@@ -4,7 +4,7 @@ import {InputLabel, Select, MenuItem, Fab} from "@material-ui/core";
 import DeviceManager from "./device/DeviceManager";
 import test from "./test.json";
 
-
+//use index.css instead this is for demo only
 const styles = {
     home: {
         display:'fixed',

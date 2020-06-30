@@ -70,6 +70,8 @@ see /src/device to see how I manage devices
 
 All of the code is run through the renderer process and the serialport code has access to Node through the nodeIntegration flag for the Electron Browser.
 
+Material UI is added just for rapid development. I'll be working on more generic components in the near future.
+
 ## Resources for Learning Electron
 
 - [electronjs.org/docs](https://electronjs.org/docs) - all of Electron's documentation
@@ -84,4 +86,8 @@ All of the code is run through the renderer process and the serialport code has 
 [CC0 1.0 (Public Domain)](LICENSE.md)
 
 
-## 
+## TODO
+
+Figure out hotloading - this may involve using a custom electron-native-patch-loader for serialport. This is will take me a while.
+
+General default react components - Using material UI as a basic starting point.

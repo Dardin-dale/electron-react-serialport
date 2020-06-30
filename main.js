@@ -5,7 +5,7 @@ const path = require('path')
 const icon = path.join(__dirname,'assets/icon.png');
 const isDev = require('electron-is-dev');
 
-//const url = require('url')
+const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -31,11 +31,10 @@ function createWindow () {
 
   // and load the index.html of the app.
   //mainWindow.loadFile(path.join(__dirname, '/index.html'))
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:8082/')
-  } else {
-    mainWindow.loadFile(path.join(__dirname, 'build/index.html'))
-  }
+  mainWindow.loadURL(url.format({
+    pathname:path.join(__dirname,'/index.html'),
+    protocol:'file:'
+  }));
 
 
   // Open the DevTools.

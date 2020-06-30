@@ -5,9 +5,7 @@
   "private": true,
   "main": "main.js",
   "scripts": {
-    "start": "npm-run-all --parallel start:react start:electron",
-    "start:electron": "electron .",
-    "start:react": "webpack-dev-server --config ./webpack.config.js --mode development",
+    "start": "electron .",
     "compile": "webpack --config ./webpack.config.js --mode production",
     "rebuild": "./node_modules/.bin/electron-rebuild",
     "pack": "npm run-script compile && electron-builder --dir",
@@ -42,7 +40,6 @@
     "electron-rebuild": "^1.11.0",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
-    "node-loader": "^0.6.0",
     "npm-run-all": "^4.1.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -53,10 +50,9 @@
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@babel/polyfill": "^7.10.1",
+    "@material-ui/core": "^4.10.2",
     "electron-is-dev": "^1.2.0",
     "npm": "^6.14.5",
-    "react-hot-loader": "^4.12.21",
-    "serialport": "^9.0.0",
-    "webpack-dev-server": "^3.11.0"
+    "serialport": "^9.0.0"
   }
 }

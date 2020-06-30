@@ -1,7 +1,12 @@
 const webpack = require('webpack');
 const path = require('path');
+const HtmlWebPackPlugin = require("html-webpack-plugin");
 
 const defaultInclude = path.resolve(__dirname, 'src')
+
+const htmlPlugin = new HtmlWebPackPlugin({
+  template: "./src/index.html"
+});
 
 module.exports = [
   
@@ -44,6 +49,9 @@ module.exports = [
     externals: {
       serialport: 'serialport',
     },
+    plugins: [
+      htmlPlugin,
+    ],
     target: 'electron-main',
     node: {
       fs: "empty",
