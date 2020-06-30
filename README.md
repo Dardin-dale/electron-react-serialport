@@ -23,7 +23,8 @@ This version uses webpack, another version based off of the Electrate template u
 see /src/device to see how I manage devices - NOTE: This application is designed for Windows OS use in mind. If you use macOS or some debian distribution, slight changes will need to be made for the serialport enumeration (list) function in the DeviceManager class.
 
 See branches:
-`master` - for a bare-bones install
+`bare-bones` - for a bare-bones install
+`gulp-simple-app` - for the gulp hot-reload simple app
 `full-app` - for an ipc/redux capable application
 
 **Use this app along with the [Electron API Demos](https://electronjs.org/#get-started) app for API code examples to help you get started.**
