@@ -44,16 +44,19 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 From your command line:
 
 ```bash
-# Clone this repository
+# Clone this template
 git clone https://github.com/Dardin-dale/electron-react-serialport
 # Go into the repository
-cd electron-quick-start
+cd your-app
+# Install windows-build-tools
+npm install --global windows-build-tools
 # Install dependencies
 npm install
 # Rebuild Serialport dependency
 npm rebuild
 # Build the distributable that can be run/tested
 npm run dist
+# Run the setup.exe in the /dist folder
 
 ```
 
