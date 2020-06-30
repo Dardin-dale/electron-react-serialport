@@ -5,11 +5,13 @@
   "private": true,
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "build": "webpack --config ./webpack.config.js",
+    "start": "npm-run-all --parallel start:react start:electron",
+    "start:electron": "electron .",
+    "start:react": "webpack-dev-server --config ./webpack.config.js --mode development",
+    "compile": "webpack --config ./webpack.config.js --mode production",
     "rebuild": "./node_modules/.bin/electron-rebuild",
-    "pack": "npm run-script build && electron-builder --dir",
-    "dist": "npm run-script build && electron-builder"
+    "pack": "npm run-script compile && electron-builder --dir",
+    "dist": "npm run-script compile && electron-builder"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "build": {
@@ -28,19 +30,33 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "@babel/core": "^7.7.4",
-    "@babel/preset-env": "^7.7.4",
+    "@babel/preset-env": "^7.10.3",
     "@babel/preset-react": "^7.7.4",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^3.6.0",
     "electron": "^7.1.2",
     "electron-builder": "^22.7.0",
+    "electron-native-loader": "^0.3.0",
+    "electron-native-patch-loader": "^0.3.0",
+    "electron-native-plugin": "^0.3.0",
     "electron-rebuild": "^1.11.0",
+    "file-loader": "^6.0.0",
+    "html-webpack-plugin": "^4.3.0",
+    "node-loader": "^0.6.0",
+    "npm-run-all": "^4.1.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "style-loader": "^1.2.1",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@babel/polyfill": "^7.10.1",
+    "electron-is-dev": "^1.2.0",
     "npm": "^6.14.5",
-    "serialport": "^9.0.0"
+    "react-hot-loader": "^4.12.21",
+    "serialport": "^9.0.0",
+    "webpack-dev-server": "^3.11.0"
   }
 }

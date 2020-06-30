@@ -5,3 +5,9 @@
 // selectively enable features needed in the rendering
 // process.
 import * as React from 'react';
+import ReactDOM from 'react-dom';
+import Home from './Home';
+
+window.onload = () => {
+    ReactDOM.render(<Home/>, document.getElementById('app'));
+};
