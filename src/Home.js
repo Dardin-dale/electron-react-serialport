@@ -42,16 +42,15 @@ class Home extends React.Component {
         }
     }
 
-    // componentDidMount = () => {
-    //     this.deviceManager = new DeviceManager;
-    //     //this.getPods();
-    //     var self = this;
+    componentDidMount = () => {
+        this.deviceManager = new DeviceManager;
+        var self = this;
 
-    //     //check device availability every 2 seconds
-    //     this.getPodLoop = setInterval(function() {
-    //         self.getPods();
-    //     }, 2000);
-    // }
+        //check device availability every 2 seconds
+        this.getPodLoop = setInterval(function() {
+            self.getPods();
+        }, 2000);
+    }
 
     getPods = () => {
         // console.log("posting getPods to manager...");

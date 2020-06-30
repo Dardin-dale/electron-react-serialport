@@ -6,7 +6,6 @@
 // process.
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import node from 'node-loader!./file.node';
 import Home from './Home';
 import './style.css';
 

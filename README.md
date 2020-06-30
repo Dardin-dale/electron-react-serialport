@@ -2,18 +2,15 @@
 
 **Clone and run for a quick way to see Electron in action.**
 
-This version still has issues - try electron-native-plugin and configurations. will probably need electron-native-patch-loader custom definition to get working.
-
-
 [Quick Start Guide For Electron](https://electronjs.org/docs/tutorial/quick-start)
 
-This application uses React in combination with Electron for the serialport use case. I personally have had a lot of trial and error getting the npm serialport module to bundle nicely with Electron and React so, I hope this helps. After importing the serialport library I use electron-rebuild to ensure that the library is re-compiled to the correct Node.js version. I manually imported React and took the examples from the [Electrate project](). I found that create-react-app and yarn gave me issues trying to troubleshoot getting the serialport library to integrate.
+###Project Notes
 
-Chrome currently has a project that has access to serialport devices through the client side code. I have yet to test these features myself and have used the
-serialport npm package for this project.
+This application uses React in combination with Electron alongside the serialport npm package. I personally have had a lot of trial and error getting the npm serialport module to bundle nicely with Electron and React so, I hope this helps. After importing the serialport library I use electron-rebuild to ensure that the library is re-compiled to the correct Node.js version. I manually imported React into an electron application. I found that create-react-app and yarn required additional set up to get the windows build tools and node-gyp dependancies for electron-rebuild working.
 
-The main thing I've learned is that for native modules such as serialport is that they need to be compiled against the same version of Node.js as your version of Electron. Here you are trying to get Electron, Electron-rebuild (uses node-gyp), and Serialport to all play nice together and in the open source world one of these
-projects will inevitably make an incompatible change and the others have to adapt. My first attempt at this in 2019 had many issues relating to electron-rebuild having an older version of node-gyp and my own version control problems. In that case I had to use the `npm install serialport --build-from-source` and hope for the best (not reccomended). So if you get a `bindings` error, try to take a close look at your version management first and then re-compile serialport.
+I have yet to test these features myself and have used the serialport npm package for this project.
+
+For native npm modules such as serialport need to be compiled against the same version of Node.js as your version of Electron. Here you are trying to get Electron, Electron-rebuild (uses node-gyp), and Serialport to all play nice together one of these projects will inevitably make an incompatible change and the others have to adapt. My first attempt at this in 2019 had many issues relating to electron-rebuild having an older version of node-gyp  than was used for either electron and serialport as well as my own version control problems. In that case I had to use the `npm install serialport --build-from-source` and hope for the best (not reccomended). So if you get a `bindings` error, try to take a close look at your version management first and then re-compile serialport.
 
 Using a node version manager such as nvm is highly recommended for this project instead of installing Node.js directly.
 
@@ -21,7 +18,9 @@ I've added webpack and babel to allow for most React/JSX compatibility and polyf
 
 This is the simple-app that is designed for quick one-page applications that don't need front-end state management. For a simpler application I prefer to directly use node integrations to talk to the serialport. For a more advanced application it is recommended to use ipc connections separating the main Electron Process from the renderer. The more advanced branch will use Redux to manage state in the renderer process and keep track of devices.
 
-see /src/device to see how I manage devices - NOTE: This application is designed for Windows OS use in mind. If you use macOS or some debian distribution, slight changes will need to be made for the serialport enumeration (list) function in the device manager module.
+This version uses webpack, another version based off of the Electrate template uses gulp, has the ability to do hot-loading. However, currently the gulp branch is not able to properly use css files as the React `import` for static assets such as css or png files is a webpack feature not a standard ES6 capability. Developing from this template will require you to rebuild 
+
+see /src/device to see how I manage devices - NOTE: This application is designed for Windows OS use in mind. If you use macOS or some debian distribution, slight changes will need to be made for the serialport enumeration (list) function in the DeviceManager class.
 
 See branches:
 `master` - for a bare-bones install
@@ -52,16 +51,16 @@ cd electron-quick-start
 npm install
 # Rebuild Serialport dependency
 npm rebuild
-# Run the app
-npm start
-# Build the distributable
-npm run-script dist
+# Build the distributable that can be run/tested
+npm run dist
 
 ```
 
 Note: If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `node` from the command prompt.
 
 ## Development
+
+You will need to install the windows build tools `npm install --global windows-build-tools` as a prerequisite for electron-rebuild
 
 see /src/device to see how I manage devices
 
