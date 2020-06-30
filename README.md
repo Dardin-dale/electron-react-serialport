@@ -18,7 +18,7 @@ I've added webpack and babel to allow for most React/JSX compatibility and polyf
 
 This is the simple-app that is designed for quick one-page applications that don't need front-end state management. For a simpler application I prefer to directly use node integrations to talk to the serialport. For a more advanced application it is recommended to use ipc connections separating the main Electron Process from the renderer. The more advanced branch will use Redux to manage state in the renderer process and keep track of devices.
 
-This version uses webpack, another version based off of the Electrate template uses gulp, has the ability to do hot-loading. However, currently the gulp branch is not able to properly use css files as the React `import` for static assets such as css or png files is a webpack feature not a standard ES6 capability. Developing from this template will require you to rebuild 
+This version uses webpack, another version based off of the Electrate template uses gulp, has the ability to do hot-loading. However, currently the gulp branch is not able to properly use css files as the React `import` for static assets such as css or png files is a webpack feature not a standard ES6 capability. Serialport is an external to webpack and can't be used in the webpack-dev-server. Developing from this template will require you to rebuild the distributable to test as electron-builder is able to correctly get both the webpack and serialport components running together.
 
 see /src/device to see how I manage devices - NOTE: This application is designed for Windows OS use in mind. If you use macOS or some debian distribution, slight changes will need to be made for the serialport enumeration (list) function in the DeviceManager class.
 
