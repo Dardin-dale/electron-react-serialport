@@ -1,6 +1,8 @@
 import React from 'react';
 import fs from 'fs';
+import {InputLabel, Select, MenuItem, Fab} from "@material-ui/core";
 import DeviceManager from "./device/DeviceManager";
+import test from "./test.json";
 
 
 const styles = {
@@ -19,12 +21,11 @@ const styles = {
     },
     text: {
         marginLeft: 'auto',
-
         marginBottom: '15px'
     },
-    button: {
+    fab: {
         display: 'block',
-        margin: 'auto'
+        marginLeft: 'auto'
     }
 }
 
@@ -54,7 +55,7 @@ class Home extends React.Component {
 
     getPods = () => {
         // console.log("posting getPods to manager...");
-        this.deviceManager.getPods().then(pods => {
+        this.deviceManager.getdevices().then(pods => {
             if(Array.isArray(pods) && JSON.stringify(this.state.pods) != JSON.stringify(pods)) {
                 console.log("pods: ", pods);
                 this.setState({pods:pods});
@@ -67,18 +68,14 @@ class Home extends React.Component {
 
     //Submit button click, performs update and sends message accordingly,
     onClick = () => {
-        if (this.state.pod.sn && this.state.desired_oem && this.state.licenses.length > 0) {
-            this.podManager.updatePod(this.state.pod, this.state.desired_oem, this.state.licenses).then(update => {
-                alert("TrakPod Updated!");
+        if (this.state.pod.sn) {
+            this.podManager.updatePod(this.state.pod).then(update => {
+                alert("LED ON");
             }).catch(error => {
-                alert("Error: no valid licenses", error);
+                alert("Error: ", error);
             })  
         } else if (!this.state.pod.sn) {
-            alert("please select a TrakPod to update")
-        } else if (!this.state.desired_oem) {
-            alert("Not possible?");
-        } else if (this.state.licenses.length === 0) {
-            alert("please upload a TrakPod license")
+            alert("please select a device")
         } else {
             alert("Error updating pod");
         }
@@ -95,12 +92,8 @@ class Home extends React.Component {
     render() {
         return (
             <div className="home" style={styles.home}>
-                <text>Hello World!</text>
-                {/* <Typography style={styles.text}>
-                    {(this.state.licenses.length > 0) ? "Upload Succesful, Licenses available" : "No active licenses"}
-                </Typography>
 
-                <InputLabel htmlFor="pod-select">Select TrakPod</InputLabel>
+                <InputLabel htmlFor="pod-select">Select Device</InputLabel>
                 <Select 
                     variant="outlined"
                     value={this.state.pod}
@@ -116,34 +109,14 @@ class Home extends React.Component {
                     })}
                 </Select>
 
-                <Typography style={styles.text}>
-                    {(this.state.pod.dist) ? "Current Distributor: " + this.state.pod.dist : "No Pod Selected"}
-                </Typography>
-
-                <InputLabel htmlFor="oem-select">Change Distributor</InputLabel>
-                <Select
-                    variant="filled"
-                    value={this.state.desired_oem}
-                    onChange={this.handleChange}
-                    inputProps={{
-                        name: 'desired_oem',
-                        id: 'oem-select'
-                    }}
-                    style={styles.select}
-                >
-                    {this.state.disti.map(oem => {
-                        return <MenuItem key={oem.name} value={oem.name}>{oem.name}</MenuItem>
-                    })}
-                </Select>
-
                 <Fab
                     variant="extended"
                     color="secondary"
                     style={styles.button}
                     onClick={this.onClick}
                 >
-                    Submit
-                </Fab> */}
+                    LED On
+                </Fab>
 
             </div>
         );

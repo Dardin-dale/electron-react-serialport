@@ -7,10 +7,7 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import Home from './Home';
-import './style.css';
 
 window.onload = () => {
     ReactDOM.render(<Home/>, document.getElementById('app'));
 };
-
-module.hot.accept();
