@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A boilerplate for Electron for serialport use",
   "private": true,
-  "main": "main.js",
+  "main": "./main.js",
   "scripts": {
     "start": "electron .",
     "compile": "webpack --config ./webpack.config.js --mode production",
@@ -13,7 +13,9 @@
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "build": {
-    "appId": "serialplate"
+    "appId": "serialplate",
+    "files": [
+      "build/**/*"]
   },
   "keywords": [
     "Electron",

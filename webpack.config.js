@@ -11,7 +11,6 @@ const htmlPlugin = new HtmlWebPackPlugin({
 module.exports = [
   
   {
-    mode: 'development',
     entry: './main.js',
     module: {
         rules: [ {
