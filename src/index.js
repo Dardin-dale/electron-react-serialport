@@ -4,9 +4,11 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
+import '@babel/polyfill'
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import Home from './Home';
+import './index.css';
 
 window.onload = () => {
     ReactDOM.render(<Home/>, document.getElementById('app'));

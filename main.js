@@ -2,8 +2,9 @@
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 //assets get used from src which is included in webpack, build folder is for electron-builder's NSIS executable/installers
-const icon = path.join(__dirname,'assets/icon.png');
+const icon = path.join(__dirname,'./icon.png');
 const isDev = require('electron-is-dev');
+// const preload = require('')
 
 const url = require('url')
 
@@ -23,7 +24,7 @@ function createWindow () {
       webSecurity: false,
       //prevents users from looking with chrome dev tools.
       //devTools: false,
-      preload: path.join(__dirname, 'preload.js')
+      //preload: path.join(__dirname, 'preload.js')
     }
   })
 
@@ -32,8 +33,9 @@ function createWindow () {
   // and load the index.html of the app.
   //mainWindow.loadFile(path.join(__dirname, '/index.html'))
   mainWindow.loadURL(url.format({
-    pathname:path.join(__dirname,'/build/index.html'),
-    protocol:'file:'
+    pathname:path.join(__dirname,'index.html'),
+    protocol:'file:',
+    slashes: true
   }));
 
 

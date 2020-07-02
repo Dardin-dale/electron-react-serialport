@@ -3,19 +3,23 @@
   "version": "1.0.0",
   "description": "A boilerplate for Electron for serialport use",
   "private": true,
-  "main": "./main.js",
+  "main": "build/main.js",
   "scripts": {
     "start": "electron .",
-    "compile": "webpack --config ./webpack.config.js --mode production",
+    "build": "npm-run-all --parallel build:main build:renderer",
+    "build:main": "webpack --config ./webpack.config.main.js --mode production",
+    "build:renderer": "webpack --config ./webpack.config.renderer.js --mode production",
     "rebuild": "./node_modules/.bin/electron-rebuild",
-    "pack": "npm run-script compile && electron-builder --dir",
-    "dist": "npm run-script compile && electron-builder"
+    "pack": "npm run-script build && electron-builder --dir",
+    "dist": "npm run-script build && electron-builder"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "build": {
     "appId": "serialplate",
     "files": [
-      "build/**/*"]
+      "build/**/*",
+      "package.json"
+    ]
   },
   "keywords": [
     "Electron",
@@ -33,6 +37,7 @@
     "@babel/preset-env": "^7.10.3",
     "@babel/preset-react": "^7.7.4",
     "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^3.6.0",
     "electron": "^7.1.2",
     "electron-builder": "^22.7.0",

@@ -1,12 +1,16 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebPackPlugin = require("html-webpack-plugin");
+const CopyPlugin = require('copy-webpack-plugin');
 
-const defaultInclude = path.resolve(__dirname, 'src')
+const defaultInclude = path.resolve(__dirname, 'src');
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/index.html"
 });
+
+// const copyPlugin = new CopyPlugin({patterns: [
+//   { from: './preload.js', to: './build/preload.js' }]});
 
 module.exports = [
   

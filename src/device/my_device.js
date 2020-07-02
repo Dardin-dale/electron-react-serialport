@@ -4,7 +4,7 @@ assume device takes in ASCII encoded buffer streams that are passed through
 the serial port object. Proper ASCII commands are dependant on your device
 */
 
-const SerialPort = require('serialport');
+const SerialPort = require( "electron" ).remote.require( "serialport" );;
 const Readline = SerialPort.parsers.Readline;
 
 

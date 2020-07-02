@@ -4,7 +4,7 @@
     closing the port and re-opening ensures that a device is not kept in the Window's registry unintentionally after a disconnection
     and the serial port enumeration continues to work as expected.
 */
-const SerialPort = require('serialport');
+const SerialPort = require( "electron" ).remote.require( "serialport" );;
 const MyDevice = require('./my_device');
 
 function DeviceManager () {
