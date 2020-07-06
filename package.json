@@ -19,7 +19,8 @@
     "files": [
       "build/**/*",
       "package.json"
-    ]
+    ],
+    "npmRebuild": false
   },
   "keywords": [
     "Electron",
