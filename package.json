@@ -34,7 +34,7 @@
     "@babel/preset-react": "^7.7.4",
     "babel-loader": "^8.1.0",
     "css-loader": "^3.6.0",
-    "electron": "^7.1.2",
+    "electron": "^7.2.4",
     "electron-builder": "^22.7.0",
     "electron-native-loader": "^0.3.0",
     "electron-native-patch-loader": "^0.3.0",
