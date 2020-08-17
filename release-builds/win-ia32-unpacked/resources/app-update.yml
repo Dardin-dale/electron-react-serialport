@@ -1,0 +1,4 @@
+owner: hamzaak
+repo: electron-react-webpack-boilerplate
+provider: github
+updaterCacheDirName: electron-react-webpack-boilerplate-updater
