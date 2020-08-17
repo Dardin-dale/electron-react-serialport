@@ -1,5 +1,7 @@
-node_modules
-/dist
-*.tzg
-/build
-release-builds
+node_modules/
+release-builds/
+
+**-lock.json
+
+public/app.js
+yarn.lock
