@@ -1,7 +1,8 @@
 import React from 'react';
 import fs from 'fs';
 import {InputLabel, Select, MenuItem, Fab} from "@material-ui/core";
-import DeviceManager from "./device/DeviceManager";
+//import DeviceManager from "./device/DeviceManager";
+import {ipcRenderer} from 'electron';
 import test from "./test.json";
 
 //use index.css instead this is for demo only
@@ -34,7 +35,7 @@ class Home extends React.Component {
         super(props);
 
         this.state = {
-            //device: [{sn:"C1x203", com:"COM15"}, {sn:"B1002", com:"COM5"}]
+            //device: [{sn:"C1x203", com:"COM15",ledOn:false}, {sn:"B1002", com:"COM5",led:false}]
             pods: [],
             pod: {},
 
@@ -44,7 +45,7 @@ class Home extends React.Component {
     }
 
     componentDidMount = () => {
-        this.deviceManager = new DeviceManager;
+        //this.deviceManager = new DeviceManager;
         var self = this;
 
         //check device availability every 2 seconds
@@ -54,32 +55,50 @@ class Home extends React.Component {
     }
 
     getPods = () => {
-        // console.log("posting getPods to manager...");
-        this.deviceManager.getdevices().then(pods => {
-            if(Array.isArray(pods) && JSON.stringify(this.state.pods) != JSON.stringify(pods)) {
-                console.log("pods: ", pods);
-                this.setState({pods:pods});
+        console.log("posting getPods to main...");
+        ipcRenderer.invoke('get-devices').then(devices => {
+            if(Array.isArray(devices) && JSON.stringify(this.state.pods) != JSON.stringify(devices)) {
+                console.log("pods: ", devices);
+                this.setState({pods:devices});
             }
         }).catch(error => {
-            // console.log("Error: ", error);
+            console.log("Error: ", error);
             this.setState({pods:[], pod: {}});
         });
+        // this.deviceManager.getdevices().then(pods => {
+        //     if(Array.isArray(pods) && JSON.stringify(this.state.pods) != JSON.stringify(pods)) {
+        //         console.log("pods: ", pods);
+        //         this.setState({pods:pods});
+        //     }
+        // }).catch(error => {
+        //     // console.log("Error: ", error);
+        //     this.setState({pods:[], pod: {}});
+        // });
     }
 
     //Submit button click, performs update and sends message accordingly,
     onClick = () => {
+        // if (this.state.pod.sn) {
+        //     this.podManager.ledToggle(this.state.pod).then(update => {
+        //         alert("LED ON");
+        //     }).catch(error => {
+        //         alert("Error: ", error);
+        //     })  
+        // } else if (!this.state.pod.sn) {
+        //     alert("please select a device")
+        // } else {
+        //     alert("Error updating pod");
+        // }
         if (this.state.pod.sn) {
-            this.podManager.updatePod(this.state.pod).then(update => {
-                alert("LED ON");
-            }).catch(error => {
-                alert("Error: ", error);
-            })  
-        } else if (!this.state.pod.sn) {
-            alert("please select a device")
-        } else {
-            alert("Error updating pod");
+            let selected_pod = this.pod
+            ipcRenderer.invoke('led-toggle', selected_pod).then(result => {
+                if (!result) {
+                  alert("Device Manager failed. try again.");
+                }
+            }).catch (err => {
+                alert("Error: ", err);
+            });
         }
-        
     }
    
     //generic change for events
@@ -115,7 +134,7 @@ class Home extends React.Component {
                     style={styles.button}
                     onClick={this.onClick}
                 >
-                    LED On
+                    LED &#x23FB;
                 </Fab>
 
             </div>
