@@ -1,52 +1,32 @@
-# Electron React Webpack Boilerplate
-
-<p>
-  This useful boilerplate project uses <a href="http://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="http://webpack.github.io/docs/">Webpack</a>, <a href="https://babeljs.io/">Babel</a> and <a href="https://github.com/gaearon/react-hot-loader">React Hot Loader</a> (HMR).
-</p>
-
-<br>
-
-<div align="center">
-  <a href="https://electronjs.org/"><img src="./public/assets/electron.png" /></a>
-  <a href="https://facebook.github.io/react/"><img src="./public/assets/react.png" /></a>
-  <a href="https://webpack.github.io/"><img src="./public/assets/webpack.png" /></a>
-  <a href="https://babeljs.io/"><img src="./public/assets/babel.png" /></a>
-</div>
-
-<hr />
-<br />
-
-<div align="center">
-<img src="./public/assets/home.png" alt="Electron React Webpack Boilerplate"/>
-</div>
-<hr />
-
-## Features
-
-* Electron 4
-* Electron Builder
-* React 16
-* Webpack 4
-* Babel 7
-* Hot Module Replacement
+# Electron React SerialPort Boilerplate
 
 ## Installation
 
-* `git clone https://github.com/hamzaak/electron-react-webpack-boilerplate.git`
-* cd electron-react-webpack-boilerplate
-* npm install
-* npm start
+* use this template in a new repository
+* `git clone https://github.com/you/your_repo.git`
+* cd your_repo
+* yarn install
+* yarn rebuild
+* yarn start
+
+Note: Hot module replacement seems to not be working yet, use `yarn bundle:react` 
+to apply your react changes.
 
 ## Packing for distribution
 
-To package the app fro windows platform:
+To package the app from windows platform:
 
-`npm run dist`
+`yarn dist`
 
-## Maintainer
+## TODO
 
-- [Hamza Ak](https://www.linkedin.com/in/hamzaak/)
+- [x] Fix HMR
+- [ ] Add cross platform installer scripts
+- [ ] clean excess webpack config
 
-## License
+### About
 
-MIT
+This application uses React in combination with Electron alongside the serialport npm package. I personally have had a lot of trial and error getting the npm serialport module to bundle nicely with Electron and React so, I hope this helps. After importing the serialport library I use electron-rebuild to ensure that the library is re-compiled to the correct Node.js version.
+
+manually adding
+

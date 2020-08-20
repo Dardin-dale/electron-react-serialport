@@ -1,9 +1,6 @@
 import React from 'react';
-import fs from 'fs';
 import {InputLabel, Select, MenuItem, Fab} from "@material-ui/core";
-//import DeviceManager from "./device/DeviceManager";
 import {ipcRenderer} from 'electron';
-import test from "./test.json";
 
 //use index.css instead this is for demo only
 const styles = {
@@ -48,10 +45,11 @@ class Home extends React.Component {
         //this.deviceManager = new DeviceManager;
         var self = this;
 
+        self.getPods();
         //check device availability every 2 seconds
-        this.getPodLoop = setInterval(function() {
-            self.getPods();
-        }, 2000);
+        // this.getPodLoop = setInterval(function() {
+        //     self.getPods();
+        // }, 2000);
     }
 
     getPods = () => {
@@ -65,36 +63,17 @@ class Home extends React.Component {
             console.log("Error: ", error);
             this.setState({pods:[], pod: {}});
         });
-        // this.deviceManager.getdevices().then(pods => {
-        //     if(Array.isArray(pods) && JSON.stringify(this.state.pods) != JSON.stringify(pods)) {
-        //         console.log("pods: ", pods);
-        //         this.setState({pods:pods});
-        //     }
-        // }).catch(error => {
-        //     // console.log("Error: ", error);
-        //     this.setState({pods:[], pod: {}});
-        // });
     }
 
     //Submit button click, performs update and sends message accordingly,
     onClick = () => {
-        // if (this.state.pod.sn) {
-        //     this.podManager.ledToggle(this.state.pod).then(update => {
-        //         alert("LED ON");
-        //     }).catch(error => {
-        //         alert("Error: ", error);
-        //     })  
-        // } else if (!this.state.pod.sn) {
-        //     alert("please select a device")
-        // } else {
-        //     alert("Error updating pod");
-        // }
         if (this.state.pod.sn) {
-            let selected_pod = this.pod
+            let selected_pod = this.state.pod
             ipcRenderer.invoke('led-toggle', selected_pod).then(result => {
                 if (!result) {
                   alert("Device Manager failed. try again.");
                 }
+                selected_pod.
             }).catch (err => {
                 alert("Error: ", err);
             });
@@ -134,7 +113,7 @@ class Home extends React.Component {
                     style={styles.button}
                     onClick={this.onClick}
                 >
-                    LED &#x23FB;
+                    LED I/O
                 </Fab>
 
             </div>

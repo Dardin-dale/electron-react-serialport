@@ -1,12 +1,13 @@
+
 // Modules to control application life and create native browser window
-const {app, BrowserWindow,ipcMain} = require('electron')
-const path = require('path')
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
 //assets get used from src which is included in webpack, build folder is for electron-builder's NSIS executable/installers
 const icon = path.join(__dirname,'./icon.png');
 const isDev = require('electron-is-dev');
 // const preload = require('')
 const url = require('url');
-const DeviceManager = require('./src/main/device/DeviceManager');
+const DeviceManager = require('./main/device/DeviceManager');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -21,7 +22,7 @@ function createWindow () {
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
-      webSecurity: false,
+      // webSecurity: false,
       //prevents users from looking with chrome dev tools.
       //devTools: false,
       //preload: path.join(__dirname, 'preload.js')
@@ -32,11 +33,11 @@ function createWindow () {
 
   // and load the index.html of the app.
   //mainWindow.loadFile(path.join(__dirname, '/index.html'))
-  mainWindow.loadURL(url.format({
-    pathname:path.join(__dirname,'index.html'),
-    protocol:'file:',
-    slashes: true
-  }));
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:8082/')
+  } else {
+    mainWindow.loadURL(`file://${__dirname}/public/index.html`)
+  }
 
 
   // Open the DevTools.

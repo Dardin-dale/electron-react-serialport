@@ -25,19 +25,29 @@ var MyDevice = function (id) {
 
     //Turns Device LED On
     this.ledOn = function() {
-        //device may expect a carriage return or other delimiter to parse messages
-        let command = Buffer.from('CAL,0,1\r\n', 'ascii');
-
-        this.port.write(command, 'ascii', function(err) {
-            if (err) throw err;
+        let self = this;
+        return new Promise(function(resolve, reject) {
+            let command = Buffer.from('CAL,0,1\r\n', 'ascii');
+            self.port.write(command, 'ascii', function(err) {
+                if (err) throw err;
+                self.port.on('data', (data) => {
+                    resolve(data)
+                });
+            });
         });
     };
 
     //Turns LED off
     this.ledOff = function() {
-        let command = Buffer.from('CAL,0,0\r\n', 'ascii');
-        this.port.write(command, 'ascii', function(err) {
-            if (err) throw err;
+        let self = this;
+        return new Promise(function(resolve, reject) {
+            let command = Buffer.from('CAL,0,0\r\n', 'ascii');
+            self.port.write(command, 'ascii', function(err) {
+                if (err) throw err;
+                self.port.on('data', (data) => {
+                    resolve(data)
+                });
+            });
         });
     };
 

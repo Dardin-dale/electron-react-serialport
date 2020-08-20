@@ -1,13 +1,17 @@
 const webpack = require('webpack');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: [
+    './src/index.js',
+    'webpack/hot/dev-server',
+    'webpack-dev-server/client?http://localhost:8082/'
+  ],
   output: {
     path: __dirname + '/public',
     publicPath: '/',
     filename: 'app.js'
   },
-  "target":"electron-main",
+  target:"electron-renderer",
   module: {
     rules: [
       {

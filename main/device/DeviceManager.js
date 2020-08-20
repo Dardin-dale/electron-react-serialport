@@ -7,14 +7,14 @@
 const SerialPort = require( "serialport" );
 const MyDevice = require('./my_device');
 
-function DeviceManager () {
+function DeviceManager() {
 
     // helper function that will retrive all of the available serialports on Windows
     // the first two com ports tend to be reserved for the OS hardware.
-    this.getPorts = function () { 
+    this.getPorts = function () {
         return new Promise((resolve, reject) => {
             let ports = [];
-    
+
             SerialPort.list().then((results) => {
                 results.forEach((port) => {
                     //e.g: COM4 on Windows, /dev/tty/look_it_up_yourself on linux
@@ -24,88 +24,92 @@ function DeviceManager () {
                         ports.push(port.path);
                     }
                 });
-    
+
                 if (ports.length > 0) {
                     resolve(ports);
-                } else {
-                    reject (Error("No Serial Ports Found"));
                 }
-            } , err => {reject (Error("Error:", err))}); 
+                else {
+                    reject(Error("No Serial Ports Found"));
+                }
+            }, err => { reject(Error("Error:", err)); });
         });
     };
 
     //retrieves the Serial Number and OEM info from all of the pods available.
-    this.getDeviceInfo = async function(ports) { 
+    this.getDeviceInfo = async function (ports) {
         let pods = [];
         //pings all devices for information simultaneously
-        await Promise.all(ports.map(async port => {
-            let info = {com:port}
+        await Promise.all(ports.map(async (port) => {
+            let info = { com: port };
             let pod = new MyDevice(port);
-            
+
             //grabs info from devices
             info['sn'] = await pod.getSn();
             info['dist'] = await pod.getOEM();
             info['ledOn'] = false;
             pods.push(info);
-            
+
             pod.port.close();
         }));
-            
+
         return pods;
-    }
+    };
 
     //main runner for getting devices. gets device serial numbers and OEM information
-    this.getdevices = async function () {
-        try{
+    this.getDevices = async function () {
+        try {
             let ports = await this.getPorts();
             let pods = await this.getDeviceInfo(ports);
-            
+
             //sort pods to ensure same behavior from promise.all return
-            pods.sort(function(a,b){
+            pods.sort(function (a, b) {
                 let sn1 = a.sn;
                 let sn2 = b.sn;
                 return (sn1 < sn2) ? -1 : (sn1 > sn2) ? 1 : 0;
             });
-            
+
             return pods;
-        } catch (err) {
+        }
+        catch (err) {
             return err;
         }
-    }
+    };
 
     //checks foe a valid pod and then updates device's OEM
-    this.updateDevice = async function(my_device, oem) {
-        try{
+    this.updateDevice = async function (my_device, oem) {
+        try {
             let valid_info = true;
             if (valid_info) {
                 let device = new MyDevice(my_device.com);
                 await device.setOEM(oem);
-                my_device.port.close();
-            } else {
+                device.port.close();
+            }
+            else {
                 throw Error("No valid licenses.");
             }
-        } catch (err) {
+        }
+        catch (err) {
             throw Error(err);
         }
-    }
+    };
 
-    this.ledToggle = async function(my_device) {
-        try{
+    this.ledToggle = async function (my_device) {
+        try {
             let device = new MyDevice(my_device.com);
-            if(my_device.ledOn) {
-                device.ledOff();
-            } else {
-                device.ledOn();
+            if (my_device.ledOn) {
+               await device.ledOff();
             }
-            
-            my_device.port.close(); 
-        } catch (err) {
+            else {
+               await device.ledOn();
+            }
+
+            device.port.close();
+        }
+        catch (err) {
             throw Error(err);
         }
-    }
-
-
+    };
 }
 
 
-export default DeviceManager;
+module.exports = DeviceManager;
