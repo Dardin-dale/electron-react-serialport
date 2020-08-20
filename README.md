@@ -6,27 +6,35 @@
 * `git clone https://github.com/you/your_repo.git`
 * cd your_repo
 * yarn install
-* yarn rebuild
-* yarn start
 
-Note: Hot module replacement seems to not be working yet, use `yarn bundle:react` 
-to apply your react changes.
+rebuild serialport (should be run after installing new packages)
+
+* yarn rebuild
+
+Note: Before connecting your device, change the input in main/device/my_device.js
+to use the serialnumber and LED on/off commands
+
+* yarn start
 
 ## Packing for distribution
 
 To package the app from windows platform:
 
-`yarn dist`
+ * yarn dist
 
 ## TODO
 
-- [x] Fix HMR
+- [ ] HMR auto refresh/disable in prod
 - [ ] Add cross platform installer scripts
-- [ ] clean excess webpack config
+- [ ] clean excess webpack config settings
+- [ ] my_device refactor
+- [ ] remove excess dependencies
 
 ### About
 
-This application uses React in combination with Electron alongside the serialport npm package. I personally have had a lot of trial and error getting the npm serialport module to bundle nicely with Electron and React so, I hope this helps. After importing the serialport library I use electron-rebuild to ensure that the library is re-compiled to the correct Node.js version.
+This application uses React in combination with Electron alongside the serialport npm package. I hope this helps. After importing the serialport library I use electron-rebuild to ensure that the library is re-compiled to the correct Node.js version. The install script ensures that electron-builder uses the correct prebuild.
 
-manually adding
 
+## License
+
+[CC0 1.0 (Public Domain)](LICENSE.md)

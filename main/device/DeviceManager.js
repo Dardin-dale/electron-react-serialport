@@ -45,7 +45,7 @@ function DeviceManager() {
 
             //grabs info from devices
             info['sn'] = await pod.getSn();
-            info['dist'] = await pod.getOEM();
+            //info['dist'] = await pod.getOEM();
             info['ledOn'] = false;
             pods.push(info);
 
