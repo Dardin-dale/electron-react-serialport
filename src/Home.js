@@ -71,9 +71,11 @@ class Home extends React.Component {
             let selected_pod = this.state.pod
             ipcRenderer.invoke('led-toggle', selected_pod).then(result => {
                 if (!result) {
-                  alert("Device Manager failed. try again.");
+                    alert("Device Manager failed. try again.");
+                } else {
+                    selected_pod.ledOn = !selected_pod.ledOn;
+                    this.setState({pod:selected_pod});
                 }
-                selected_pod.
             }).catch (err => {
                 alert("Error: ", err);
             });
