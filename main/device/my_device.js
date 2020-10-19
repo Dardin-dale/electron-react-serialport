@@ -35,12 +35,19 @@ long_call = function (self, command, expected) {
                 let msg = data.toString('utf8').split(";");
                 let checksum = msg[1];
                 let info = msg[0];
-
+                if (!validate_checksum(checksum)) {
+                    reject("Invalid Checksum");
+                }
                 
                 
             });
         });
     });
+}
+
+// Dummy checksum validation, will depend on your device's internal process 
+validate_checksum = function(checksum) {
+    return checksum;
 }
 
 
