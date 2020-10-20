@@ -50,8 +50,9 @@ function DeviceManager() {
             pods.push(info);
 
             pod.port.close();
-        }));
-
+        })).catch(error => { 
+            throw error
+        });
         return pods;
     };
 
@@ -111,5 +112,9 @@ function DeviceManager() {
     };
 }
 
+process.on('unhandledRejection', (reason, p) => {
+    console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+    // application specific logging, throwing an error, or other logic here
+  });
 
 module.exports = DeviceManager;

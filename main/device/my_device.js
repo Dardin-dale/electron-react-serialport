@@ -10,40 +10,59 @@ const Readline = SerialPort.parsers.Readline;
 
 //Simple call just gets basic call response from device
 //only verifies that device Acknowledges receipt
-simple_call = function (self, command) {
-    return new Promise(function(resolve, reject) {
-        self.port.write(command, 'ascii', function(err) {
-            if (err) throw err;
-            self.port.on('data', (data) => {
-                resolve(data)
-            });
+simple_call = function (self, resolve, reject, command) {
+    self.port.write(command, 'ascii', function(err) {
+        if (err) reject(err);
+        self.port.on('data', (data) => {
+            resolve(data)
         });
     });
 };
 
 /*
-Long call, waits for an expected response signature,
-expected should be the first enum in the returned data
-device gives acknowlegement, calculates/collects info, 
-then sends second response with data 
+Data Call, data needs to be retrieved from non_volatile memory on the device.
+This data is returned within the Acknowlegement from the device.
+Some of the parsing will depend on your device.
 */
-long_call = function (self, command, expected) {
-    return new Promise(function(resolve, reject) {
-        self.port.write(command, 'ascii', function(err) {
-            if (err) throw err;
-            self.port.on('data', (data) => {
-                let msg = data.toString('utf8').split(";");
-                let checksum = msg[1];
-                let info = msg[0];
-                if (!validate_checksum(checksum)) {
-                    reject("Invalid Checksum");
-                }
-                
-                
-            });
+data_call = function(self, resolve, reject, command) {
+    self.port.write(command, 'ascii', function(err) {
+        if (err) reject(err);
+        self.port.on('data', (data) => {
+            let msg = data.toString('utf8').split(";");
+            let checksum = msg[1];
+            let info = msg[0].split(",");
+            if (!validate_checksum(checksum)) {
+                reject("Invalid Checksum");
+            }
+            resolve(info[3]);
         });
     });
 }
+
+/*
+Long call, waits for an expected response signature,
+expected should be the first enum in the returned data
+device gives acknowlegement, calculates/collects info, 
+then sends second response with the data collected from
+the device.
+*/
+// long_call = async function (self, resolve, reject, command, expected) {
+//     return new Promise(function(resolve, reject) {
+//         self.port.write(command, 'ascii', function(err) {
+//             if (err) throw err;
+//             self.port.on('data', (data) => {
+//                 let msg = data.toString('utf8').split(";");
+//                 let checksum = msg[1];
+//                 let info = msg[0];
+//                 if (!validate_checksum(checksum)) {
+//                     reject("Invalid Checksum");
+//                 }
+                
+//                 // TODO: add some resolve logic for various data call back
+//             });
+//         });
+//     });
+// }
 
 // Dummy checksum validation, will depend on your device's internal process 
 validate_checksum = function(checksum) {
@@ -55,7 +74,7 @@ validate_checksum = function(checksum) {
 //Add all of the 
 var MyDevice = function (id) {
     //Creates new Serial Port reference
-    this.parser = new Readline({delimiter: ';', encoding: 'ascii'});
+    this.parser = new Readline({delimiter: '\n', encoding: 'ascii'});
 
     //initiates port serial object
     this.port = new SerialPort(id, function (err) {
@@ -71,61 +90,44 @@ var MyDevice = function (id) {
     this.ledOn = function() {
         let self = this;
         let command = Buffer.from('CAL,0,1\r\n', 'ascii');
-        return simple_call(self, command);
+        return new Promise(function(resolve, reject) {
+            simple_call(self, resolve, reject, command);
+        });
     };
 
     //Turns LED off
     this.ledOff = function() {
         let self = this;
         let command = Buffer.from('CAL,0,0\r\n', 'ascii');
-        return simple_call(self, command);
+        return new Promise(function(resolve, reject) {
+            simple_call(self, resolve, reject, command);
+        });
     };
 
     //Retrieves Pod serial number (index 3 in response)
     this.getSn = function() {
         let self = this;
+        let command = Buffer.from('GET,SER_NUMBER\r\n', 'ascii');
         return new Promise(function(resolve, reject) {
-            let command = Buffer.from('GET,SER_NUMBER\r\n', 'ascii');
-            self.port.write(command, 'ascii', function(err) {
-                if (err) reject(err);
-                self.port.on('data', (data) => {
-                    let msg = data.toString('utf8').split(",");
-                    let sn = msg[3].split(';')[0];
-                    resolve(sn);
-                });
-            });
-        }); 
+            data_call(self, resolve, reject, command);
+        });
     };
 
     //gets Disti/OEM Key
     this.getOEM = function() {
         let self = this;
+        let command = Buffer.from('GET,39\r\n', 'ascii');
         return new Promise(function(resolve, reject) {
-            let command = Buffer.from('GET,39\r\n', 'ascii');
-            self.port.write(command, 'ascii', function(err) {
-                if (err) reject(err);
-                self.port.on('data', (data) => {
-                    let msg = data.toString('utf8').split(",");
-                    let oem = msg[3].split(';')[0];
-                    resolve(oem);
-                });
-            });
+            data_call(self, resolve, reject, command);
         });
     };
 
     //Sets Serial Number for the device
     this.setSn = function(serialnumber) {
         let self = this;
-        return new Promise(function (resolve, reject) {
-            let command = Buffer.from('SET,SER_NUMBER,' + serialnumber + '\r\n', 'ascii');
-            self.port.write(command, 'ascii', function(err) {
-                if (err) reject(err);
-                self.port.on('data', (data) => {
-                    let msg = data.toString('utf8').split(",");
-                    let return_msg = msg[3].split(';')[0];
-                    resolve(return_msg);
-                });
-            });
+        let command = Buffer.from('SET,SER_NUMBER,' + serialnumber + '\r\n', 'ascii');
+        return new Promise(function(resolve, reject) {
+            data_call(self, resolve, reject, command);
         });
     };    
 
