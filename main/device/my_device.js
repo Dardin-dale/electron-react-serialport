@@ -14,6 +14,11 @@ simple_call = function (self, resolve, reject, command) {
     self.port.write(command, 'ascii', function(err) {
         if (err) reject(err);
         self.port.on('data', (data) => {
+            let msg = data.toString('utf8').split(";");
+            let info = msg[0].split(",");
+            if(!(info[0] === "!ACK")){
+                reject("Command: " + command + "not properly acknowledged.")
+            }
             resolve(data)
         });
     });
@@ -31,7 +36,12 @@ data_call = function(self, resolve, reject, command) {
             let msg = data.toString('utf8').split(";");
             let checksum = msg[1];
             let info = msg[0].split(",");
-            if (!validate_checksum(checksum)) {
+            //Validate that the command was properly acknowledged
+            if(!(info[0] === "!ACK")){
+                reject("Command: " + command + "not properly acknowledged.")
+            }
+            //Validate that all information was correct in the message
+            if (!validate_checksum(msg, checksum)) {
                 reject("Invalid Checksum");
             }
             resolve(info[3]);
@@ -64,14 +74,15 @@ the device.
 //     });
 // }
 
-// Dummy checksum validation, will depend on your device's internal process 
-validate_checksum = function(checksum) {
+// Dummy CRC checksum validation, will depend on your device's command process
+// This also ensures that all the data is recieved correctly
+validate_checksum = function(msg, checksum) {
     return checksum;
 }
 
 
 //This is the SerialPort device Class with Relevent information
-//Add all of the 
+//I've decided to keep the Promise within this class for consistency.
 var MyDevice = function (id) {
     //Creates new Serial Port reference
     this.parser = new Readline({delimiter: '\n', encoding: 'ascii'});
