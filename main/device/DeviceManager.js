@@ -60,8 +60,6 @@ function DeviceManager() {
                 //info['dist'] = await pod.getOEM();
                 info['ledOn'] = false;
                 pods.push(info);
-
-                await pod.port.close();
             });
         })).catch(error => { 
             throw error
@@ -109,7 +107,6 @@ function DeviceManager() {
             if (valid_info) {
                 let device = new MyDevice(my_device.com);
                 await device.setOEM(oem);
-                await device.port.close();
             }
             else {
                 throw Error("No valid licenses.");
@@ -129,8 +126,6 @@ function DeviceManager() {
             else {
                await this.cmdHandler[my_device.com].add(device.ledOn());
             }
-
-            await device.port.close();
         }
         catch (err) {
             return Error(err);
@@ -142,10 +137,8 @@ function DeviceManager() {
             return await this.cmdHandler[my_device.com].add(async () => {
                 let device = new MyDevice(my_device.com);
                 let data = await device.collectData();
-                console.log("Data resolved: ", data[0]);
-                return data[0]
-            }
-            );
+                return data[0];
+            });
         } catch (err) {
             return Error(err);
         }
@@ -153,10 +146,11 @@ function DeviceManager() {
 
     this.collectSpecial = async function(my_device) {
         try{
-            let device = new MyDevice(my_device.com);
-            let data = await this.cmdHandler[my_device.com].add(device.collectSpecial());
-            await this.cmdHandler[my_device.com].add(device.port.close);
-            return data;
+            return await this.cmdHandler[my_device.com].add(async () => {
+                let device = new MyDevice(my_device.com);
+                let data = await device.collectSpecial();
+                return data;
+            });
         } catch (err) {
             return Error(err);
         }

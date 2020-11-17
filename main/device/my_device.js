@@ -10,6 +10,7 @@ const Readline = SerialPort.parsers.Readline;
 
 //Simple call just gets basic call response from device
 //only verifies that device Acknowledges receipt
+//Closing Serialport after call so that connection can be re-established.
 simple_call = function (self, resolve, reject, command) {
     self.port.write(command, 'ascii', function(err) {
         if (err) reject(err);
@@ -19,7 +20,9 @@ simple_call = function (self, resolve, reject, command) {
             if(!(info[0] === "!ACK")){
                 reject("Command: " + command + "not properly acknowledged.")
             }
-            resolve(data)
+            self.port.close(() => {
+                resolve(data);
+            });
         });
     });
 };
@@ -44,7 +47,9 @@ data_call = function(self, resolve, reject, command) {
             if (!validate_checksum(msg, checksum)) {
                 reject("Invalid Checksum");
             }
-            resolve(info[3]);
+            self.port.close(() => {
+                resolve(info[3]);
+            });
         });
     });
 }
@@ -77,16 +82,13 @@ long_call = function (self, resolve, reject, command, expected) {
                 collected_data.push(msg[0]);
             }
             if (msg[0] === self.idle){
-                self.port.close();
-                // resolve(collected_data);
+                self.port.close(() => {
+                    resolve(collected_data);
+                });
             }
             // TODO: add some resolve logic for various data call back
         });
 
-        self.port.on('close', (err) => {
-            if (err) reject(err);
-            resolve(collected_data);
-        })
     });
 }
 
