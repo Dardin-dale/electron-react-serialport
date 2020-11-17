@@ -56,23 +56,34 @@ device gives acknowlegement, calculates/collects info,
 then sends second response with the data collected from
 the device.
 */
-// long_call = async function (self, resolve, reject, command, expected) {
-//     return new Promise(function(resolve, reject) {
-//         self.port.write(command, 'ascii', function(err) {
-//             if (err) throw err;
-//             self.port.on('data', (data) => {
-//                 let msg = data.toString('utf8').split(";");
-//                 let checksum = msg[1];
-//                 let info = msg[0];
-//                 if (!validate_checksum(checksum)) {
-//                     reject("Invalid Checksum");
-//                 }
-                
-//                 // TODO: add some resolve logic for various data call back
-//             });
-//         });
-//     });
-// }
+long_call = function (self, resolve, reject, command, expected) {
+    let collected_data = [];
+    self.port.write(command, 'ascii', function(err) {
+        if (err) throw err;
+        self.port.on('data', (data) => {
+            let msg = data.toString('utf8').split(";");
+            let checksum = msg[1];
+            let info = msg[0].split(",");
+            if (!validate_checksum(msg[0], checksum)) {
+                reject("Invalid Checksum");
+            }
+            if (info[0] === "!ACK") {
+                console.log("Command acknowledged");
+            } else if (info[0]==="!NACK") {
+                console.log("Invalid Command!");
+                //TODO: maybe resolve instead?
+                reject("Invalid Command");
+            } else if (info[0] === expected){
+                collected_data.push(msg[0]);
+            }
+            if (msg[0] === self.idle){
+                resolve(collected_data);
+            }
+            // TODO: add some resolve logic for various data call back
+        });
+    });
+}
+
 
 // Dummy CRC checksum validation, will depend on your device's command process
 // This also ensures that all the data is recieved correctly
@@ -97,6 +108,9 @@ var MyDevice = function (id) {
 
     this.com = id;
 
+    //This is the response when the device is Idle after a long command
+    this.idle = '!STATUS,IDLE'
+
     //Turns Device LED On
     this.ledOn = function() {
         let self = this;
@@ -119,6 +133,7 @@ var MyDevice = function (id) {
     this.getSn = function() {
         let self = this;
         let command = Buffer.from('GET,SER_NUMBER\r\n', 'ascii');
+        //return data_call2(self, command);
         return new Promise(function(resolve, reject) {
             data_call(self, resolve, reject, command);
         });
@@ -140,7 +155,26 @@ var MyDevice = function (id) {
         return new Promise(function(resolve, reject) {
             data_call(self, resolve, reject, command);
         });
-    };    
+    };
+    
+    //Have the Device collect some data
+    this.collectData = function() {
+        let self = this;
+        let command = Buffer.from('RUN_RP,0\r\n');
+        let expected = "!RP"
+        return new Promise(function(resolve,reject){
+            long_call(self, resolve, reject, command, expected);
+        })
+    }
+
+    this.collectSpecial = function() {
+        let self = this;
+        let command = Buffer.from('RUN_QC,Z069,0967,1330,4\r\n');
+        let expected = '!QC'
+        return new Promise(function(resolve, reject) {
+            long_call(self, resolve, reject, command, expected)
+        })
+    }
 
 }
 

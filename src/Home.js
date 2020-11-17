@@ -1,5 +1,5 @@
 import React from 'react';
-import {InputLabel, Select, MenuItem, Fab} from "@material-ui/core";
+import {InputLabel, Select, MenuItem, Fab,Typography} from "@material-ui/core";
 import {ipcRenderer} from 'electron';
 
 //use index.css instead this is for demo only
@@ -35,6 +35,7 @@ class Home extends React.Component {
             //device: [{sn:"C1x203", com:"COM15",ledOn:false}, {sn:"B1002", com:"COM5",led:false}]
             pods: [],
             pod: {},
+            returnMsg: "",
 
             msg_open: false,
             msg_variant: "info"
@@ -52,6 +53,7 @@ class Home extends React.Component {
         // }, 2000);
     }
 
+    //Gets list of devices
     getPods = () => {
         console.log("posting getPods to main...");
         ipcRenderer.invoke('get-devices').then(devices => {
@@ -89,6 +91,38 @@ class Home extends React.Component {
         })
     }
 
+    //Tells device to collect a piece of data with a longer turn around.
+    takeData = () => {
+        if (this.state.pod.sn) {
+            let selected_pod = this.state.pod
+            ipcRenderer.invoke('collect-data', selected_pod).then(result => {
+                if (!result) {
+                    alert("Result, " + result);
+                } else {
+                    this.setState({returnMsg:result});
+                }
+            }).catch (err => {
+                alert("Error: ", err);
+            });
+        }
+    }
+
+    //multiple valid data responses are given by the device.
+    special = () => {
+        if (this.state.pod.sn) {
+            let selected_pod = this.state.pod
+            ipcRenderer.invoke('special-data', selected_pod).then(result => {
+                if (!result) {
+                    alert("Device Manager failed. try again.");
+                } else {
+                    this.setState({returnMsg:result[result.length - 1]});
+                }
+            }).catch (err => {
+                alert("Error: ", err);
+            });
+        }
+    }
+
     render() {
         return (
             <div className="home" style={styles.home}>
@@ -117,6 +151,28 @@ class Home extends React.Component {
                 >
                     LED I/O
                 </Fab>
+
+                <Fab
+                    variant="extended"
+                    color="secondary"
+                    style={styles.button}
+                    onClick={this.takeData}
+                >
+                    Collect Data
+                </Fab>
+
+                <Fab
+                    variant="extended"
+                    color="default"
+                    style={styles.button}
+                    onClick={this.special}
+                >
+                    Multi-Data Command
+                </Fab>
+
+                <Typography>
+                    {this.state.returnMsg}
+                </Typography>
 
             </div>
         );
