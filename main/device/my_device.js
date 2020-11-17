@@ -59,7 +59,7 @@ the device.
 long_call = function (self, resolve, reject, command, expected) {
     let collected_data = [];
     self.port.write(command, 'ascii', function(err) {
-        if (err) throw err;
+        if (err) reject(err);
         self.port.on('data', (data) => {
             let msg = data.toString('utf8').split(";");
             let checksum = msg[1];
@@ -77,10 +77,16 @@ long_call = function (self, resolve, reject, command, expected) {
                 collected_data.push(msg[0]);
             }
             if (msg[0] === self.idle){
-                resolve(collected_data);
+                self.port.close();
+                // resolve(collected_data);
             }
             // TODO: add some resolve logic for various data call back
         });
+
+        self.port.on('close', (err) => {
+            if (err) reject(err);
+            resolve(collected_data);
+        })
     });
 }
 

@@ -6,7 +6,6 @@
 */
 const SerialPort = require( "serialport" );
 const MyDevice = require('./my_device');
-const CQueue = require('./CommandQueue');
 const {default: PQueue} = require('p-queue');
 
 function DeviceManager() {
@@ -34,7 +33,6 @@ function DeviceManager() {
                             this.cmdHandler[com].on('add', () => {
                                 console.log(`Task Added.  Size: ${this.cmdHandler[com].size}  Pending: ${this.cmdHandler[com].pending}`);
                             });
-                            // this.cmdHandler[com] = new CQueue();
                         }
                     }
                 });
@@ -144,10 +142,10 @@ function DeviceManager() {
             return await this.cmdHandler[my_device.com].add(async () => {
                 let device = new MyDevice(my_device.com);
                 let data = await device.collectData();
-                console.log("Data resolved: ", data[0])
-                console.log("Close? ", await device.port.close());
-                return data[0];
-            })
+                console.log("Data resolved: ", data[0]);
+                return data[0]
+            }
+            );
         } catch (err) {
             return Error(err);
         }
@@ -157,7 +155,7 @@ function DeviceManager() {
         try{
             let device = new MyDevice(my_device.com);
             let data = await this.cmdHandler[my_device.com].add(device.collectSpecial());
-            await device.port.close();
+            await this.cmdHandler[my_device.com].add(device.port.close);
             return data;
         } catch (err) {
             return Error(err);
