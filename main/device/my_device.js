@@ -17,7 +17,9 @@ simple_call = function (self, resolve, reject, command) {
         self.port.on('data', (data) => {
             let msg = data.toString('utf8').split(";");
             let info = msg[0].split(",");
-            if(!(info[0] === "!ACK")){
+            if (info[0] === "!ACK") {
+                console.log("Command: " + command.toString().trim() + " acknowledged.");
+            } else {
                 reject("Command: " + command + "not properly acknowledged.")
             }
             self.port.close(() => {
@@ -40,7 +42,9 @@ data_call = function(self, resolve, reject, command) {
             let checksum = msg[1];
             let info = msg[0].split(",");
             //Validate that the command was properly acknowledged
-            if(!(info[0] === "!ACK")){
+            if (info[0] === "!ACK") {
+                console.log("Command: " + command.toString().trim() + " acknowledged.");
+            } else {
                 reject("Command: " + command + "not properly acknowledged.")
             }
             //Validate that all information was correct in the message
@@ -73,10 +77,9 @@ long_call = function (self, resolve, reject, command, expected) {
                 reject("Invalid Checksum");
             }
             if (info[0] === "!ACK") {
-                console.log("Command acknowledged");
+                console.log("Command: " + command.toString().trim() + " acknowledged.");
             } else if (info[0]==="!NACK") {
-                console.log("Invalid Command!");
-                //TODO: maybe resolve instead?
+                // console.log("Invalid Command!");
                 reject("Invalid Command");
             } else if (info[0] === expected){
                 collected_data.push(msg[0]);
@@ -168,8 +171,8 @@ var MyDevice = function (id) {
     //Have the Device collect some data
     this.collectData = function() {
         let self = this;
-        let command = Buffer.from('RUN_RP,0\r\n');
-        let expected = "!RP"
+        let command = Buffer.from('RUN_CMD,PARAM\r\n');
+        let expected = "!CMD"
         return new Promise(function(resolve,reject){
             long_call(self, resolve, reject, command, expected);
         })
@@ -177,8 +180,8 @@ var MyDevice = function (id) {
 
     this.collectSpecial = function() {
         let self = this;
-        let command = Buffer.from('RUN_QC,Z069,0967,1330,4\r\n');
-        let expected = '!QC'
+        let command = Buffer.from('RUN_CMD2,PARAM1,PARAM2,PARAM3\r\n');
+        let expected = '!CMD2'
         return new Promise(function(resolve, reject) {
             long_call(self, resolve, reject, command, expected)
         })

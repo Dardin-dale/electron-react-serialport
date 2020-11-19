@@ -1,8 +1,8 @@
 /* 
     This is the main Device Manager, to keep things consistent device commands should be filtered through here accordingly.
     You can just keep serial ports open and contiue to communicate over them. But, in my experience with other seialport libraries in Java
-    closing the port and re-opening ensures that a device is not kept in the Window's registry unintentionally after a disconnection
-    and the serial port enumeration continues to work as expected.
+    closing the port and re-opening better ensures that a device is not kept in the Window's registry unintentionally after a disconnection
+    and the serial port enumeration works more reliably; this may depend on your device's driver.
 */
 const SerialPort = require( "serialport" );
 const MyDevice = require('./my_device');
@@ -10,7 +10,7 @@ const {default: PQueue} = require('p-queue');
 
 function DeviceManager() {
 
-    //cmdHandler is a Map {id: Cqueue} for managing incoming promises
+    //cmdHandler is a Map {id: Pqueue} for managing incoming promises
     //this should prevent cross-talk and race cases.
     this.cmdHandler = {} 
 
@@ -22,7 +22,7 @@ function DeviceManager() {
 
             SerialPort.list().then((results) => {
                 results.forEach((port) => {
-                    //e.g: COM4 on Windows, /dev/tty/look_it_up_yourself on linux
+                    //e.g: COM4 on Windows, /dev/tty/look_it_up on linux
                     let com = port.path;
                     //Windows specific com parsing
                     let id = parseInt(com.slice(3));
@@ -30,9 +30,10 @@ function DeviceManager() {
                         ports.push(com);
                         if (!this.cmdHandler[com]){
                             this.cmdHandler[com] = new PQueue({concurrency: 1});
-                            this.cmdHandler[com].on('add', () => {
-                                console.log(`Task Added.  Size: ${this.cmdHandler[com].size}  Pending: ${this.cmdHandler[com].pending}`);
-                            });
+                            //This will relay that tasks have been added to the device queue
+                            // this.cmdHandler[com].on('add', () => {
+                            //     console.log(`Task Added.  Size: ${this.cmdHandler[com].size}  Pending: ${this.cmdHandler[com].pending}`);
+                            // });
                         }
                     }
                 });
@@ -45,7 +46,8 @@ function DeviceManager() {
         });
     };
 
-    //retrieves the Serial Number and OEM info from all of the pods available.
+    //Retrieves the Serial Number and OEM info from all of the pods available.
+    //TODO: filter/handle non-intended devices.
     this.getDeviceInfo = async function (ports) {
         let pods = [];
         //pings all devices for information simultaneously
@@ -68,7 +70,7 @@ function DeviceManager() {
     };
 
     //main runner for getting devices. gets device serial numbers
-    //TODO: Run this in a task Scheduler pass to Redux
+    //TODO: Run this in a task scheduler and pass to Redux
     this.getDevices = async function () {
         try {
             console.log("getting devices.");
@@ -100,7 +102,7 @@ function DeviceManager() {
         }
     };
 
-    //checks foe a valid pod and then updates device's OEM
+    //checks for a valid device and then updates device's OEM
     this.updateDevice = async function (my_device, oem) {
         try {
             let valid_info = true;
@@ -117,6 +119,7 @@ function DeviceManager() {
         }
     };
 
+    //Toggles LED on and off.
     this.ledToggle = async function (my_device) {
         try {
             let device = new MyDevice(my_device.com);
@@ -132,6 +135,7 @@ function DeviceManager() {
         }
     };
 
+    //Tells device to collect data from a peripheral component
     this.collectData = async function(my_device) {
         try{
             return await this.cmdHandler[my_device.com].add(async () => {
@@ -144,6 +148,7 @@ function DeviceManager() {
         }
     }
 
+    //Retrieves multiple data points from a peripheral component
     this.collectSpecial = async function(my_device) {
         try{
             return await this.cmdHandler[my_device.com].add(async () => {
@@ -160,10 +165,6 @@ function DeviceManager() {
 process.on('unhandledRejection', (reason, p) => {
     console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
     // application specific logging, throwing an error, or other logic here
-  });
-
-// process.on('error', function(err) {
-//     console.log("Error: "+err);
-// });
+});
 
 module.exports = DeviceManager;
