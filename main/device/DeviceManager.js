@@ -28,6 +28,7 @@ function DeviceManager() {
                     let id = parseInt(com.slice(3));
                     if (id > 2) {
                         ports.push(com);
+                        //Adding a promise queue for each device to prevent race cases from the UI
                         if (!this.cmdHandler[com]){
                             this.cmdHandler[com] = new PQueue({concurrency: 1});
                             //This will relay that tasks have been added to the device queue
