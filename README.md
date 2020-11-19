@@ -27,7 +27,6 @@ To package the app from windows platform:
 - [ ] HMR auto refresh/disable in prod
 - [ ] Add cross platform installer scripts
 - [ ] clean excess webpack config settings
-- [ ] my_device refactor
 - [ ] remove excess dependencies
 
 ### About
