@@ -92,3 +92,19 @@ ipcMain.handle('led-toggle', async(event, device) => {
   return true;
 
 });
+
+ipcMain.handle('collect-data', async(event, device) => {
+  try {
+    return await deviceManager.collectData(device);
+  } catch (err) {
+    return err;
+  }
+});
+
+ipcMain.handle('special-data', async(event, device) => {
+  try {
+    return await deviceManager.collectSpecial(device);
+  } catch (err) {
+    return err;
+  }
+});
