@@ -1,193 +1,190 @@
-/*Device API handles all functions that could be passed to a
-device via serialport communications 
-assume device takes in ASCII encoded buffer streams that are passed through
-the serial port object. Proper ASCII commands are dependant on your device
-*/
+const Params = require('./parameters');
+const { default: PQueue } = require('p-queue');
+const { Serialport } = require('serialport');
+const { ReadlineParser } require('@serialport/parser-readline');
 
-const SerialPort = require( "serialport" );
-const Readline = SerialPort.parsers.Readline;
+/**
+ * Calculates an IBM CRC16 checksum.
+ *
+ * @param {Byte} b The byte of data to process for the checksum.
+ * @param  crc The previous value of the checksum.
+ * @return The new value of the checksum.
+ */
+function ComputeCRC16MSB(b, crc) {
+  let data = b;
+  data <<= 8;
+  for (var i = 0; i < 8; i++) {
+    if (((data ^ crc) & 0x8000) != 0) {
+      crc = 0xffff & ((crc << 1) ^ 0x8005);
+    } else {
+      crc = 0xffff & (crc << 1);
+    }
+    data <<= 1;
+  }
+  return crc;
+}
 
+function generateChecksum(msg) {
+    let result = "";
+    let calc = 0;
+    msg = msg.toString(16) + ";" //ensure we have a utf-16 string
+    let buffer = msg.split("").map( x => x.charCodeAt(0));
+    for (let i = 0; i < buffer.length; i++) {
+        calc = computeCRC16MSB(buffer[i], calc);
+    }
+    result = calc.toString(16).toUpperCase();
+    //ensure to pad result for fixed return length
+    result = result.padStart(4, 0);
+    return result;
+}
 
-//Simple call just gets basic call response from device
-//only verifies that device Acknowledges receipt
-//Closing Serialport after call so that connection can be re-established.
-simple_call = function (self, resolve, reject, command) {
-    self.port.write(command, 'ascii', function(err) {
-        if (err) reject(err);
-        self.port.on('data', (data) => {
-            let msg = data.toString('utf8').split(";");
-            let info = msg[0].split(",");
-            if (info[0] === "!ACK") {
-                console.log("Command: " + command.toString().trim() + " acknowledged.");
-            } else {
-                reject("Command: " + command + "not properly acknowledged.")
-            }
-            self.port.close(() => {
-                resolve(data);
-            });
+function validate_checksum(msg, checksum) {
+    let msg_check = generateChecksum(msg);
+    return mst_check === checksum;
+}
+
+async function ack_call(self, resolve, reject, cmd) {
+    try {
+        self.port.once('error', err => reject(err))
+        let timer = setTimeout(() => {
+          self.port.removeAllListeners('error')
+          reject("Device Timed out.")
+        }, 5000);
+        
+        self.port.write(cmd, function(err) {
+            if (err) {
+              self.port.removeAllListeners('error')
+              reject(err);
+            } 
+            //messege sent successfully
         });
+
+        self.parser.once('data', (data) => {
+            let msg = data.toString('ascii');
+            let checksum = msg[1].trim();
+            let info = msg[0].split(",");
+            if (info[0] === "!NACK") {
+                clearTimeout(timer)
+                self.port.removeAllListeners('error')
+                reject("Command: " + cmd + " not properly Ack'd!")
+            }
+            if(!valid_checksum(msg[0], checksum)){
+                clearTimeout(timer)
+                self.port.removeAllListeners('error')
+                reject("Invalid checksum, Data corrupt");
+            }
+            clearTimeout(timer);
+            self.port.removeAllListeners('error')
+            resolve(info[2]);
+        })
+    } catch (err) {
+       reject(err);
+    }
+}
+
+multi_receive = async function (self, resolve, reject, command, expected) {
+  try {
+    self.port.once('error', err => reject(err))
+    let collected_data = [];
+    let timer = setTimeout(() => {
+      self.parser.removeAllListeners('data');
+      self.port.removeAllListeners('error')
+      reject(
+        "TrakPod timed out. CMD: " +
+          command.toString().trim() +
+          " failed. Com: " +
+          self.com
+      );
+    }, 15000);
+
+    let write_ok = await self.port.write(command, function(err) {
+        if (err) {
+          self.port.removeAllListeners('error')
+          reject(err);
+        } 
     });
+
+    const promise = new Promise((resolve, reject) => {
+      self.parser.on("data", (data) => {
+        let msg = data.toString("utf8").split(";");
+        let checksum = msg[1].trim();
+        let info = msg[0].split(",");
+        if (!validate_checksum(msg[0], checksum)) {
+          clearTimeout(timer);
+          self.port.removeAllListeners('error')
+          reject(
+            "Invalid Checksum returned from Pod. received: " +
+              msg[0] +
+              " check: " +
+              checksum
+          );
+        }
+        if (info[0] === "!ACK") {
+          //Good to do nothing...?
+        } else if (info[0] === "!NACK") {
+          clearTimeout(timer);
+          self.port.removeAllListeners('error')
+          reject(
+            "Command: " +
+              command.toString().trim() +
+              " not properly acknowledged."
+          );
+        } else if (info[0] === expected) {
+          collected_data.push(msg[0]);
+        }
+        if (msg[0] === self.idle) {
+          clearTimeout(timer);
+          self.port.removeAllListeners('error')
+          resolve(collected_data);
+        }
+      });
+    });
+    let res = await promise;
+    self.parser.removeAllListeners("data");
+    self.port.removeAllListeners('error')
+    resolve(res);
+  } catch (err) {
+    reject(err);
+  }
 };
 
-/*
-Data Call, data needs to be retrieved from non_volatile memory on the device.
-This data is returned within the Acknowlegement from the device.
-Some of the parsing will depend on your device.
-*/
-data_call = function(self, resolve, reject, command) {
-    self.port.write(command, 'ascii', function(err) {
-        if (err) reject(err);
-        self.port.on('data', (data) => {
-            let msg = data.toString('utf8').split(";");
-            let checksum = msg[1];
-            let info = msg[0].split(",");
-            //Validate that the command was properly acknowledged
-            if (info[0] === "!ACK") {
-                console.log("Command: " + command.toString().trim() + " acknowledged.");
-            } else {
-                reject("Command: " + command + "not properly acknowledged.")
-            }
-            //Validate that all information was correct in the message
-            if (!validate_checksum(msg, checksum)) {
-                reject("Invalid Checksum");
-            }
-            self.port.close(() => {
-                resolve(info[3]);
+class myDevice {
+    constructor(id) {
+         this.path = id;
+         this.parser = new ReadlineParser({delimiter: '\r', 
+            encoding: 'ascii'});
+         this.port = new Serialport({path: id, baudRate: 115200}, 
+            function (err) {
+               throw "Unable to initiate port: "+ err;
+            });
+         this.queue = new PQueue({concurrency: 1});
+         this.port.pipe(this.parser);
+    }
+
+    static PID = 'xxxx'
+    static VID = 'xxxx'
+
+    ledOn() {
+        let self = this;
+        let cmd = Buffer.from("!LED,1\r", 'ascii');
+        return this.queue.add(
+            new Promise((resolve, reject) => {
+                ack_call(self, resolve, reject, cmd);
+            })
+        );
+    }
+
+    ledOff() {
+        let self = this;
+        let cmd = Buffer.from("!LED,0\r", 'ascii');
+        return this.queue.add(() => {
+            return new Promise(function (resolve, reject) {
+                ack_call(self, resolve, reject, cmd);
             });
         });
-    });
-}
-
-/*
-Long call, waits for an expected response signature,
-expected should be the first enum in the returned data
-device gives acknowlegement, calculates/collects info, 
-then sends second response with the data collected from
-the device.
-*/
-long_call = function (self, resolve, reject, command, expected) {
-    let collected_data = [];
-    self.port.write(command, 'ascii', function(err) {
-        if (err) reject(err);
-        self.port.on('data', (data) => {
-            let msg = data.toString('utf8').split(";");
-            let checksum = msg[1];
-            let info = msg[0].split(",");
-            if (!validate_checksum(msg[0], checksum)) {
-                reject("Invalid Checksum");
-            }
-            if (info[0] === "!ACK") {
-                console.log("Command: " + command.toString().trim() + " acknowledged.");
-            } else if (info[0]==="!NACK") {
-                // console.log("Invalid Command!");
-                reject("Invalid Command");
-            } else if (info[0] === expected){
-                collected_data.push(msg[0]);
-            }
-            if (msg[0] === self.idle){
-                self.port.close(() => {
-                    resolve(collected_data);
-                });
-            }
-            // TODO: add some resolve logic for various data call back
-        });
-
-    });
-}
-
-
-// Dummy CRC checksum validation, will depend on your device's command process
-// This also ensures that all the data is recieved correctly
-validate_checksum = function(msg, checksum) {
-    return checksum;
-}
-
-
-//This is the SerialPort device Class with Relevent information
-//I've decided to keep the Promise within this class for consistency.
-var MyDevice = function (id) {
-    //Creates new Serial Port reference
-    this.parser = new Readline({delimiter: '\n', encoding: 'ascii'});
-
-    //initiates port serial object
-    this.port = new SerialPort(id, function (err) {
-            if (err) throw err;
-        });
-
-    //sets up pipe for device readline buffer 
-    this.port.pipe(this.parser);
-
-    this.com = id;
-
-    //This is the response when the device is Idle after a long command
-    this.idle = '!STATUS,IDLE'
-
-    //Turns Device LED On
-    this.ledOn = function() {
-        let self = this;
-        let command = Buffer.from('CAL,0,1\r\n', 'ascii');
-        return new Promise(function(resolve, reject) {
-            simple_call(self, resolve, reject, command);
-        });
-    };
-
-    //Turns LED off
-    this.ledOff = function() {
-        let self = this;
-        let command = Buffer.from('CAL,0,0\r\n', 'ascii');
-        return new Promise(function(resolve, reject) {
-            simple_call(self, resolve, reject, command);
-        });
-    };
-
-    //Retrieves Pod serial number (index 3 in response)
-    this.getSn = function() {
-        let self = this;
-        let command = Buffer.from('GET,SER_NUMBER\r\n', 'ascii');
-        //return data_call2(self, command);
-        return new Promise(function(resolve, reject) {
-            data_call(self, resolve, reject, command);
-        });
-    };
-
-    //gets Disti/OEM Key
-    this.getOEM = function() {
-        let self = this;
-        let command = Buffer.from('GET,39\r\n', 'ascii');
-        return new Promise(function(resolve, reject) {
-            data_call(self, resolve, reject, command);
-        });
-    };
-
-    //Sets Serial Number for the device
-    this.setSn = function(serialnumber) {
-        let self = this;
-        let command = Buffer.from('SET,SER_NUMBER,' + serialnumber + '\r\n', 'ascii');
-        return new Promise(function(resolve, reject) {
-            data_call(self, resolve, reject, command);
-        });
-    };
-    
-    //Have the Device collect some data
-    this.collectData = function() {
-        let self = this;
-        let command = Buffer.from('RUN_CMD,PARAM\r\n');
-        let expected = "!CMD"
-        return new Promise(function(resolve,reject){
-            long_call(self, resolve, reject, command, expected);
-        })
     }
 
-    this.collectSpecial = function() {
-        let self = this;
-        let command = Buffer.from('RUN_CMD2,PARAM1,PARAM2,PARAM3\r\n');
-        let expected = '!CMD2'
-        return new Promise(function(resolve, reject) {
-            long_call(self, resolve, reject, command, expected)
-        })
-    }
 
 }
 
-
-module.exports = MyDevice;
+module.exports = myDevice; 

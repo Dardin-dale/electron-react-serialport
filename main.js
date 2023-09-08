@@ -1,17 +1,15 @@
-
+require('dotenv').config()
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 //assets get used from src which is included in webpack, build folder is for electron-builder's NSIS executable/installers
 const icon = path.join(__dirname,'./icon.png');
 const isDev = require('electron-is-dev');
+const routes = require('./main/routes')
 // const preload = require('')
-const url = require('url');
-const DeviceManager = require('./main/device/DeviceManager');
-
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+
+
 
 function createWindow () {
   // Create the browser window.
@@ -21,11 +19,9 @@ function createWindow () {
     center:true,
     autoHideMenuBar: true,
     webPreferences: {
-      nodeIntegration: true,
-      // webSecurity: false,
-      //prevents users from looking with chrome dev tools.
-      //devTools: false,
-      //preload: path.join(__dirname, 'preload.js')
+      devTools: true,
+      //Allows renderer to access IPCMain routes
+      preload: path.join(__dirname, '/public/preload.js')
     }
   })
 
@@ -39,9 +35,6 @@ function createWindow () {
     mainWindow.loadURL(`file://${__dirname}/public/index.html`)
   }
 
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -73,38 +66,3 @@ app.on('activate', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-const deviceManager = new DeviceManager();
-
-//gets devices from device manager
-ipcMain.handle('get-devices', async(event) => {
-  const result = await deviceManager.getDevices();
-  return result;
-});
-
-//toggles LED on/off for given device
-ipcMain.handle('led-toggle', async(event, device) => {
-  try {
-    deviceManager.ledToggle(device);
-  } catch (err) {
-    return false;
-  }
-  //toggle message sent sucessfully to device.
-  return true;
-
-});
-
-ipcMain.handle('collect-data', async(event, device) => {
-  try {
-    return await deviceManager.collectData(device);
-  } catch (err) {
-    return err;
-  }
-});
-
-ipcMain.handle('special-data', async(event, device) => {
-  try {
-    return await deviceManager.collectSpecial(device);
-  } catch (err) {
-    return err;
-  }
-});
