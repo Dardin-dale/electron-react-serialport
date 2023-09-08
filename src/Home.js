@@ -1,5 +1,5 @@
 import React from 'react';
-import {InputLabel, Select, MenuItem, Fab,Typography} from "@material-ui/core";
+import {InputLabel, Select, MenuItem, Fab,Typography} from "@mui";
 import {ipcRenderer} from 'electron';
 
 //use index.css instead this is for demo only
