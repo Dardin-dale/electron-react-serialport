@@ -18,8 +18,7 @@ describe('setAsyncInterval', () => {
         }, 5);
 
         await sleep(200);
-        handle.cancel();
-        await sleep(60);
+        await handle.cancel();
 
         expect(maxConcurrent).toBe(1);
         expect(runs).toBeGreaterThan(1);
@@ -33,11 +32,23 @@ describe('setAsyncInterval', () => {
 
         await sleep(35);
         const beforeCancel = count;
-        handle.cancel();
+        await handle.cancel();
         await sleep(50);
 
         expect(count).toBe(beforeCancel);
         expect(beforeCancel).toBeGreaterThan(0);
+    });
+
+    test('cancel() resolves only after the in-flight tick completes', async () => {
+        let resolved = false;
+        const handle = setAsyncInterval(async () => {
+            await sleep(60);
+            resolved = true;
+        }, 5);
+
+        await sleep(20);
+        await handle.cancel();
+        expect(resolved).toBe(true);
     });
 
     test('a tick that throws is logged but does not break the loop', async () => {
@@ -53,7 +64,7 @@ describe('setAsyncInterval', () => {
         }, 10);
 
         await sleep(60);
-        handle.cancel();
+        await handle.cancel();
 
         expect(throws).toBe(1);
         expect(runs).toBeGreaterThanOrEqual(3);

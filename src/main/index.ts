@@ -165,8 +165,10 @@ function createWindow(): void {
 }
 
 async function shutdown(): Promise<void> {
-    enumerationHandle?.cancel();
-    pollingHandle?.cancel();
+    await Promise.all([
+        enumerationHandle?.cancel() ?? Promise.resolve(),
+        pollingHandle?.cancel() ?? Promise.resolve(),
+    ]);
     await manager.shutdown();
 }
 
