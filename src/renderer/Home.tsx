@@ -3,9 +3,8 @@ import {
     Box,
     Chip,
     Container,
-    IconButton,
     Paper,
-    Stack,
+    Switch,
     Table,
     TableBody,
     TableCell,
@@ -13,8 +12,6 @@ import {
     TableRow,
     Typography,
 } from '@mui/material';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 
 interface DeviceRow {
     status: 'live' | 'lost';
@@ -25,6 +22,7 @@ interface DeviceRow {
 
 export default function Home() {
     const [devices, setDevices] = useState<Map<string, DeviceRow>>(new Map());
+    const [ledOn, setLedOn] = useState<Map<string, boolean>>(new Map());
 
     useEffect(() => {
         window.api.getDevices().then((paths) => {
@@ -79,8 +77,14 @@ export default function Home() {
         };
     }, []);
 
-    const handleLedOn = (path: string) => window.api.ledOn(path);
-    const handleLedOff = (path: string) => window.api.ledOff(path);
+    const handleLedToggle = async (path: string, on: boolean) => {
+        setLedOn((prev) => new Map(prev).set(path, on));
+        const ok = on ? await window.api.ledOn(path) : await window.api.ledOff(path);
+        if (!ok) {
+            // Roll back if the device rejected the command.
+            setLedOn((prev) => new Map(prev).set(path, !on));
+        }
+    };
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -127,28 +131,13 @@ export default function Home() {
                                         <TableCell>{d.ledDrive ?? '-'}</TableCell>
                                         <TableCell>{d.lastUpdate ?? '-'}</TableCell>
                                         <TableCell align="right">
-                                            <Stack
-                                                direction="row"
-                                                spacing={0.5}
-                                                justifyContent="flex-end"
-                                            >
-                                                <IconButton
-                                                    size="small"
-                                                    disabled={stale}
-                                                    onClick={() => handleLedOn(path)}
-                                                    aria-label={`turn LED on for ${path}`}
-                                                >
-                                                    <LightbulbIcon fontSize="small" />
-                                                </IconButton>
-                                                <IconButton
-                                                    size="small"
-                                                    disabled={stale}
-                                                    onClick={() => handleLedOff(path)}
-                                                    aria-label={`turn LED off for ${path}`}
-                                                >
-                                                    <LightbulbOutlinedIcon fontSize="small" />
-                                                </IconButton>
-                                            </Stack>
+                                            <Switch
+                                                size="small"
+                                                checked={ledOn.get(path) ?? false}
+                                                disabled={stale}
+                                                onChange={(e) => handleLedToggle(path, e.target.checked)}
+                                                inputProps={{ 'aria-label': `LED toggle for ${path}` }}
+                                            />
                                         </TableCell>
                                     </TableRow>
                                 );
