@@ -1,7 +1,26 @@
 node_modules/
-release-builds/
-.vscode/
-**-lock.json
 
-public/app.js
+# electron-vite build output
+out/
+
+# electron-builder installer output
+dist/
+release-builds/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# editor / OS
+.vscode/
+.DS_Store
+
+# logs
+*.log
+npm-debug.log*
+
+# env (template only commits .example.env)
+.env
+
+# package manager
 yarn.lock
+**-lock.json

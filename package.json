@@ -1,70 +1,81 @@
 {
-  "appId": "electron-react-serialport-boilerplate",
-  "name": "electron-react-webpack-boilerplate",
-  "productName": "Electron React Serialport Boilerplate",
-  "author": "Logan Crecraft",
-  "version": "1.0.0",
-  "license": "MIT",
-  "description": "A minimal desktop app that uses electron, react, and webpack",
-  "main": "main.js",
-  "keywords": [
-    "Electron",
-    "React",
-    "Webpack",
-    "Babel",
-    "serialport"
-  ],
-  "scripts": {
-    "start": "npm-run-all --parallel start:react start:electron",
-    "start:electron": "electron .",
-    "start:react": "webpack serve --config ./webpack.config.js --mode development",
-    "startProd": "webpack serve --config ./webpack.config.js --mode production",
-    "start:prod": "npm-run-all --parallel startProd start:electron",
-    "postinstall": "electron-builder install-app-deps",
-    "bundle:react": "webpack --mode production",
-    "dist": "npm run \"bundle:react\" && node installers/windows/installer.js",
-  },
-  "devDependencies": {
-    "@babel/core": "^7.17.5",
-    "@babel/plugin-proposal-class-properties": "^7.4.0",
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-react": "^7.16.7",
-    "@babel/preset-typescript": "^7.16.7",
-    "@babel/register": "^7.10.5",
-    "@types/electron": "^1.6.10",
-    "@types/react": "^17.0.42",
-    "@types/react-dom": "^17.0.13",
-    "babel-loader": "^8.0.4",
-    "css-loader": "^4.3.0",
-    "dotenv-webpack": "^7.1.0",
-    "electron-builder": "^23.4.0",
-    "html-webpack-plugin": "^5.5.0",
-    "npm-run-all": "^4.1.5",
-    "react-hot-loader": "^4.3.11",
-    "react-svg-loader": "^3.0.3",
-    "react-test-renderer": "^17.0.2",
-    "start-server-and-test": "^1.15.4",
-    "style-loader": "^1.2.1",
-    "webpack": "^5.76.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.7.4",
-    "webpack-merge": "^5.8.0"
-  },
-  "dependencies": {
-    "@mui/icons-material": "^5.5.0",
-    "@mui/lab": "^5.0.0-alpha.75",
-    "@mui/material": "^5.5.0",
-    "@mui/styles": "^5.5.0",
-    "@types/node": "^16.7.13",
-    "dotenv": "^14.3.2",
-    "electron-devtools-installer": "^3.2.0",
-    "electron-is-dev": "^1.1.0",
-    "electron-updater": "^5.2.0",
-    "html-react-parser": "^3.0.4",
-    "p-queue": "^6.6.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "ts-loader": "^9.2.6",
-    "typescript": "^4.5.5",
-  }
+    "name": "electron-react-serialport",
+    "version": "1.0.0",
+    "description": "Electron + React boilerplate wiring node-serialport-tutorial's DeviceManager into a desktop app",
+    "author": "Logan Crecraft",
+    "license": "MIT",
+    "type": "module",
+    "main": "./out/main/index.js",
+    "scripts": {
+        "dev": "electron-vite dev",
+        "build": "electron-vite build",
+        "preview": "electron-vite preview",
+        "start": "electron-vite preview",
+        "dist": "electron-vite build && electron-builder",
+        "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "postinstall": "electron-builder install-app-deps"
+    },
+    "keywords": [
+        "electron",
+        "react",
+        "vite",
+        "serialport"
+    ],
+    "engines": {
+        "node": ">=22"
+    },
+    "dependencies": {
+        "@emotion/react": "^11.13.0",
+        "@emotion/styled": "^11.13.0",
+        "@mui/icons-material": "^6.1.0",
+        "@mui/material": "^6.1.0",
+        "p-queue": "^8.0.1",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+        "serialport": "^13.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^25.0.0",
+        "@types/react": "^19.0.0",
+        "@types/react-dom": "^19.0.0",
+        "@vitejs/plugin-react": "^5.2.0",
+        "electron": "^42.0.0",
+        "electron-builder": "^26.0.0",
+        "electron-vite": "^5.0.0",
+        "typescript": "^6.0.0",
+        "vite": "^7.0.0",
+        "vitest": "^4.0.0"
+    },
+    "build": {
+        "appId": "com.logancrecraft.electron-react-serialport",
+        "productName": "Electron Serialport Boilerplate",
+        "directories": {
+            "output": "release-builds"
+        },
+        "files": [
+            "out/**/*",
+            "package.json"
+        ],
+        "extraResources": [
+            "icon.png"
+        ],
+        "win": {
+            "target": "nsis",
+            "icon": "icon.png"
+        },
+        "linux": {
+            "target": "AppImage",
+            "icon": "icon.png",
+            "category": "Utility"
+        },
+        "mac": {
+            "target": "dmg",
+            "icon": "icon.png"
+        },
+        "nsis": {
+            "createDesktopShortcut": "always"
+        }
+    }
 }
