@@ -4,10 +4,34 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # Electron and @types/node move fast and tend to break native modules
-    # when bumped without verification. Allow patch/minor updates only.
+    # Batch all minor + patch updates into a single PR per week to cut review
+    # overhead. Majors stay as individual PRs so each gets explicit attention.
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     ignore:
+      # Electron and @types/node move fast and tend to break native modules
+      # when bumped without verification. Allow patch/minor updates only.
       - dependency-name: "electron"
         update-types: ["version-update:semver-major"]
       - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # Vite + @vitejs/plugin-react majors are blocked by electron-vite's peer
+      # dep range. Skip them here so dependabot stops opening unmergeable PRs.
+      # Remove these ignores once electron-vite ships a version that supports
+      # the newer vite major.
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitejs/plugin-react"
+        update-types: ["version-update:semver-major"]
+      # p-queue 9+ is ESM-only. The Electron main process bundles to CJS via
+      # externalizeDepsPlugin, so it can't require() an ESM module at runtime
+      # — the main process crashes silently and the preload bridge fails to
+      # register. Stay on v8 until either electron-vite supports ESM main
+      # output by default, or this template migrates main to ESM.
+      - dependency-name: "p-queue"
         update-types: ["version-update:semver-major"]

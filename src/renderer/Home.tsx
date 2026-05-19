@@ -136,7 +136,7 @@ export default function Home() {
                                                 checked={ledOn.get(path) ?? false}
                                                 disabled={stale}
                                                 onChange={(e) => handleLedToggle(path, e.target.checked)}
-                                                inputProps={{ 'aria-label': `LED toggle for ${path}` }}
+                                                slotProps={{ input: { 'aria-label': `LED toggle for ${path}` } }}
                                             />
                                         </TableCell>
                                     </TableRow>
